@@ -36,6 +36,10 @@
         }
     </script>
     <style>
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
         .glow-lime {
             box-shadow: 0 0 20px rgba(187, 242, 70, 0.3);
         }
@@ -56,20 +60,40 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #a3d63b;
         }
+        /* Infinite dot grid background */
+        .dot-grid-bg {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(17, 50, 37, 0.18) 1.5px, transparent 1.5px);
+            background-size: 28px 28px;
+            background-position: 0 0;
+        }
+        /* Ensure page content sits above the dot grid */
+        nav, section, footer {
+            position: relative;
+            z-index: 1;
+        }
     </style>
 </head>
 <body class="bg-white text-gray-900 font-sans antialiased overflow-x-hidden">
 
-    <!-- 1. Navigation Bar -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-brand-dark/95 backdrop-blur-md border-b border-white/5 transition-all duration-300 py-4">
-        <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <!-- Infinite Dot Grid Background -->
+    <div class="dot-grid-bg" aria-hidden="true"></div>
+
+    <!-- 1. Navigation Bar (Dynamic Island style with balanced padding) -->
+    <nav id="main-nav" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-5xl bg-brand-dark/95 backdrop-blur-md border border-white/10 rounded-full shadow-2xl transition-all duration-500 ease-out py-3 px-4">
+        <div class="mx-auto flex items-center justify-between">
             <!-- Logo -->
-            <a href="#home" class="flex items-center space-x-2 text-2xl font-extrabold tracking-tight text-white hover:opacity-90 transition-opacity">
+            <a href="#home" class="flex items-center space-x-2 text-xl font-extrabold tracking-tight text-white hover:opacity-90 transition-opacity">
                 <span>bitz</span><span class="text-brand-lime">.</span><span>dev</span>
             </a>
 
             <!-- Desktop Links -->
-            <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-white/80">
+            <div class="hidden md:flex items-center space-x-7 text-sm font-medium text-white/80">
                 <a href="#about" class="hover:text-brand-lime transition-colors">About</a>
                 <a href="#services" class="hover:text-brand-lime transition-colors">Services</a>
                 <a href="#ecosystem" class="hover:text-brand-lime transition-colors">Ecosystem</a>
@@ -77,9 +101,9 @@
                 <a href="#contact" class="hover:text-brand-lime transition-colors">Contact</a>
             </div>
 
-            <!-- CTA button (desktop) -->
+            <!-- CTA button (desktop with matching concentric curvature) -->
             <div class="hidden md:block">
-                <a href="#contact" class="px-6 py-2.5 bg-brand-lime text-brand-dark hover:bg-brand-limeHover font-bold rounded-full text-sm shadow-md hover:scale-[1.03] transition-all inline-block">
+                <a id="nav-cta" href="#contact" class="px-5 py-2 bg-brand-lime text-brand-dark hover:bg-brand-limeHover font-bold rounded-full text-sm shadow-md hover:scale-[1.03] transition-all duration-500 ease-out inline-block">
                     Let's Talk
                 </a>
             </div>
@@ -94,7 +118,7 @@
         </div>
 
         <!-- Mobile Drawer menu -->
-        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 bg-brand-dark border-b border-white/5 py-6 px-6 space-y-4 shadow-xl transition-all duration-300 transform scale-y-95 origin-top">
+        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 mt-2 bg-brand-dark border border-white/10 rounded-3xl py-6 px-6 space-y-4 shadow-2xl transition-all duration-300 transform scale-y-95 origin-top">
             <a href="#about" class="block text-lg font-medium text-white/90 hover:text-brand-lime transition-colors py-2 border-b border-white/5">About</a>
             <a href="#services" class="block text-lg font-medium text-white/90 hover:text-brand-lime transition-colors py-2 border-b border-white/5">Services</a>
             <a href="#ecosystem" class="block text-lg font-medium text-white/90 hover:text-brand-lime transition-colors py-2 border-b border-white/5">Ecosystem</a>
@@ -162,10 +186,10 @@
                     </div>
                 </div>
 
-                <!-- Custom Aesthetic Mockup Content (Simulated Code & Visual UI Layout) -->
-                <div class="flex-grow flex flex-col lg:flex-row items-center justify-between gap-8 py-4">
+                <!-- Custom Aesthetic Mockup Content (Simulated Code) -->
+                <div class="flex-grow flex flex-col items-center justify-between gap-8 py-4">
                     <!-- Left: Real Mock Code -->
-                    <div class="w-full lg:w-1/2 text-left font-mono text-xs sm:text-sm text-white/80 space-y-2 overflow-x-auto select-none bg-brand-darker p-4 sm:p-6 rounded-2xl border border-white/5">
+                    <div class="w-full text-left font-mono text-xs sm:text-sm text-white/80 space-y-2 overflow-x-auto select-none bg-brand-darker p-4 sm:p-6 rounded-2xl border border-white/5">
                         <p><span class="text-brand-lime">import</span> { <span class="text-amber-300">WebArchitect</span> } <span class="text-brand-lime">from</span> <span class="text-green-400">'bitz-dev'</span>;</p>
                         <p><span class="text-brand-lime">const</span> clientPortfolio = <span class="text-brand-lime">new</span> <span class="text-amber-300">WebArchitect</span>({</p>
                         <p class="pl-4">developer: <span class="text-green-400">"Bitupan Borah"</span>,</p>
@@ -175,39 +199,6 @@
                         <p>});</p>
                         <p class="mt-4 text-white/30">// Initiating high-conversion layout...</p>
                         <p>clientPortfolio.<span class="text-emerald-400">buildFuture</span>();</p>
-                    </div>
-
-                    <!-- Right: Developer Visual Card & Mockup graphic -->
-                    <div class="w-full lg:w-1/2 flex justify-center lg:justify-end">
-                        <div class="relative w-72 h-44 sm:w-80 sm:h-52 bg-gradient-to-br from-brand-sage to-brand-dark border border-white/20 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-full bg-brand-lime/20 border border-brand-lime flex items-center justify-center font-bold text-brand-lime text-base">
-                                        BB
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold tracking-wide">bitz.dev</p>
-                                        <p class="text-[10px] text-white/50">Frontend Freelancer</p>
-                                    </div>
-                                </div>
-                                <span class="text-xs bg-brand-lime/10 border border-brand-lime/30 text-brand-lime px-2.5 py-1 rounded-full font-bold">Pro</span>
-                            </div>
-                            
-                            <div class="mt-4 space-y-2">
-                                <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                                    <div class="w-11/12 h-full bg-brand-lime rounded-full"></div>
-                                </div>
-                                <div class="flex justify-between text-[11px] text-white/60">
-                                    <span>Code Execution Speed</span>
-                                    <span class="text-brand-lime font-bold">99% (Perfect)</span>
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between items-center text-xs text-white/50 border-t border-white/10 pt-3">
-                                <span>Locale: Assam, India</span>
-                                <span class="font-bold text-white">GMT +5:30</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -226,7 +217,7 @@
                 </div>
 
                 <!-- Overlay 2: Available Status (Bottom Right) -->
-                <div class="absolute bottom-4 right-4 md:bottom-8 md:right-8 bg-white text-gray-900 px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-2.5 border border-brand-light">
+                <div class="absolute bottom-4 right-4 md:bottom-8 md:right-8 bg-white text-gray-900 px-4 py-3 rounded-2xl shadow-xl flex items-center space-2.5 border border-brand-light">
                     <span class="relative flex h-3 w-3">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
@@ -238,7 +229,7 @@
         </div>
     </section>
 
-    <section id='founder' class='py-20 bg-white'><div class='max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center'><div><img src='favicon.png' alt='Bitupan Borah' class='w-full max-w-lg rounded-3xl shadow-2xl border-8 border-white object-cover'></div><div><h2 class='text-4xl font-extrabold text-brand-dark'>Hi, I'm Bitupan Borah.</h2><p class='mt-6 text-gray-600'> I handle every stage of your website personally, giving you direct communication, faster decisions, and complete accountability.</p><a href='#contact' class='inline-block mt-6 px-6 py-3 bg-brand-dark text-white rounded-full'>Start a Project</a></div></div></section>
+    <section id='founder' class='py-20 bg-white'><div class='max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center'><div class='flex justify-center'><img src='favicon.png' alt='Bitupan Borah' class='w-full max-w-lg rounded-3xl shadow-2xl border-8 border-white object-cover mx-auto'></div><div class='text-center lg:text-left'><h2 class='text-4xl font-extrabold text-brand-dark'>Hi, I'm Bitupan Borah.</h2><p class='mt-6 text-gray-600'> I handle every stage of your website personally, giving you direct communication, faster decisions, and complete accountability.</p><a href='#contact' class='inline-block mt-6 px-6 py-3 bg-brand-dark text-white rounded-full'>Start a Project</a></div></div></section>
 <!-- 3. Metrics Section -->
     <section class="py-12 bg-brand-light/35 border-y border-brand-light">
         <div class="max-w-7xl mx-auto px-6">
@@ -772,5 +763,32 @@
 
     <!-- Frontend Controller Logic -->
     <script src="app.js"></script>
+    <script>
+        // Dynamic Island nav: shrinks and tightens as the user scrolls down
+        (function () {
+            const nav = document.getElementById('main-nav');
+            const cta = document.getElementById('nav-cta');
+            if (!nav) return;
+            const onScroll = () => {
+                if (window.scrollY > 40) {
+                    nav.classList.add('max-w-3xl', 'py-2', 'top-3');
+                    nav.classList.remove('max-w-5xl', 'py-3', 'top-4');
+                    if (cta) {
+                        cta.classList.add('py-1.5');
+                        cta.classList.remove('py-2');
+                    }
+                } else {
+                    nav.classList.add('max-w-5xl', 'py-3', 'top-4');
+                    nav.classList.remove('max-w-3xl', 'py-2', 'top-3');
+                    if (cta) {
+                        cta.classList.add('py-2');
+                        cta.classList.remove('py-1.5');
+                    }
+                }
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+    </script>
 </body>
 </html>
