@@ -774,15 +774,15 @@
                     nav.classList.add('max-w-3xl', 'py-2', 'top-3');
                     nav.classList.remove('max-w-5xl', 'py-3', 'top-4');
                     if (cta) {
-                        cta.classList.add('py-1.5');
-                        cta.classList.remove('py-2');
+                        cta.classList.add('py-1.5', 'rounded-2xl', 'translate-x-2');
+                        cta.classList.remove('py-2', 'rounded-full', 'translate-x-0');
                     }
                 } else {
                     nav.classList.add('max-w-5xl', 'py-3', 'top-4');
                     nav.classList.remove('max-w-3xl', 'py-2', 'top-3');
                     if (cta) {
-                        cta.classList.add('py-2');
-                        cta.classList.remove('py-1.5');
+                        cta.classList.add('py-2', 'rounded-full', 'translate-x-0');
+                        cta.classList.remove('py-1.5', 'rounded-2xl', 'translate-x-2');
                     }
                 }
             };
