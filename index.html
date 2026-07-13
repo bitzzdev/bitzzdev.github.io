@@ -101,6 +101,30 @@
                 radial-gradient(ellipse 70% 50% at 75% 55%, rgba(243,242,239,0.08) 0%, transparent 65%),
                 radial-gradient(ellipse 60% 40% at 50% 30%, rgba(243,242,239,0.06) 0%, transparent 55%);
         }
+        .hero-sunray {
+            position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.45; will-change: transform;
+            background:
+                conic-gradient(from 310deg at top right, rgba(243,242,239,0.15) 0deg, rgba(243,242,239,0.07) 25deg, transparent 55deg),
+                radial-gradient(ellipse 120% 70% at top right, rgba(243,242,239,0.08) 0%, transparent 100%);
+            mix-blend-mode: screen;
+            animation: sunrayPulse 7s ease-in-out infinite alternate;
+        }
+        @keyframes sunrayPulse {
+            0% { opacity: 0.35; transform: scale(1) rotate(0deg); }
+            100% { opacity: 0.55; transform: scale(1.03) rotate(1.5deg); }
+        }
+        .hero-sunray-noise {
+            position: absolute; inset: -50%; z-index: 0; pointer-events: none; opacity: 0.06; will-change: transform;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 120px 120px;
+            animation: sunrayNoise 10s ease-in-out infinite alternate;
+            mix-blend-mode: screen;
+        }
+        @keyframes sunrayNoise {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(4%, -3%) scale(1.02); }
+        }
         .hero-grain {
             position: absolute; inset: -50%; z-index: 0; pointer-events: none; opacity: 0.04; will-change: transform;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -460,6 +484,8 @@
           ═══════════════════════════════════════════════════════════ -->
     <section class="hero" id="home">
         <div class="hero-bg"></div>
+        <div class="hero-sunray"></div>
+        <div class="hero-sunray-noise"></div>
         <div class="hero-grain"></div>
         <h1 class="hero-title">bitz.dev</h1>
         <p class="hero-subtitle">Freelance Frontend Developer crafting pixel-perfect, high-performance web experiences.</p>
