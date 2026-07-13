@@ -1,794 +1,1426 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bitz.dev | Bitupan Borah - Freelance Frontend Developer</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <!-- Google Fonts: Inter and Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+SanEverys:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS with custom configuration -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            dark: '#113225', // Deep Forest Green
-                            darker: '#0a1f17', // Extra Deep Forest
-                            lime: '#bbf246', // Vibrant Lime
-                            limeHover: '#a3d63b',
-                            light: '#f3f6f4', // Soft white / greyish sage
-                            sage: '#1e4836', // Intermediate sage green
-                            cardBg: '#e8eee9' // Card background from reference
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
-                        mono: ['Courier New', 'Courier', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #080807;
+            --text: #f3f2ef;
+            --text-muted: rgba(243, 242, 239, 0.5);
+            --accent: #c5a56f;
+            --accent-light: #e3c793;
+            --border: rgba(243, 242, 239, 0.08);
+            --serif: 'DM Serif Display', Georgia, serif;
+            --sans: 'Inter', -apple-system, sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
         html {
-            -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
         }
-        .glow-lime {
-            box-shadow: 0 0 20px rgba(187, 242, 70, 0.3);
+
+        body {
+            background: var(--bg);
+            overflow-x: hidden;
         }
-        .glow-lime-sm {
-            box-shadow: 0 0 10px rgba(187, 242, 70, 0.2);
+
+        ::selection {
+            background: var(--accent);
+            color: var(--bg);
         }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+
+        a {
+            color: inherit;
+            text-decoration: none;
         }
-        ::-webkit-scrollbar-track {
-            background: #113225;
+
+        img {
+            max-width: 100%;
+            display: block;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #bbf246;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a3d63b;
-        }
-        /* Infinite dot grid background */
-        .dot-grid-bg {
+
+        /* Grain Overlay */
+        .grain {
             position: fixed;
             inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 256px 256px;
+            animation: grain 0.5s steps(6) infinite;
+        }
+
+        @keyframes grain {
+            0%, 100% { transform: translate(0, 0); }
+            17% { transform: translate(-5%, -10%); }
+            33% { transform: translate(3%, -15%); }
+            50% { transform: translate(12%, 9%); }
+            67% { transform: translate(9%, 4%); }
+            83% { transform: translate(-1%, 7%); }
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            mix-blend-mode: difference;
+        }
+
+        .nav-logo {
+            font-family: var(--serif);
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.875rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.6;
+        }
+
+        .nav-cta {
+            font-size: 0.875rem;
+            padding: 0.6rem 1.5rem;
+            border: 1px solid rgba(243, 242, 239, 0.3);
+            border-radius: 100px;
+            transition: all 0.3s;
+        }
+
+        .nav-cta:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .nav-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .nav-menu-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-eyebrow {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s 0.2s forwards;
+        }
+
+        .hero-title {
+            font-family: var(--serif);
+            font-size: clamp(3rem, 8vw, 7rem);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            max-width: 900px;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeUp 1s 0.4s forwards;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .hero-sub {
+            font-size: 1.125rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin-top: 2.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s 0.6s forwards;
+        }
+
+        .hero-cta-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s 0.8s forwards;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--text);
+            color: var(--bg);
+            font-family: var(--sans);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 100px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-primary:hover {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: transparent;
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(243, 242, 239, 0.3);
+            background: rgba(243, 242, 239, 0.05);
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 3rem;
+            left: 2rem;
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            writing-mode: vertical-rl;
+            opacity: 0;
+            animation: fadeUp 0.8s 1s forwards;
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Section Styles */
+        section {
+            padding: 8rem 2rem;
+            position: relative;
+        }
+
+        .section-label {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: var(--serif);
+            font-size: clamp(2rem, 5vw, 4rem);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            max-width: 800px;
+        }
+
+        .section-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin-top: 1.5rem;
+        }
+
+        /* Metrics Section */
+        .metrics {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .metric-item {
+            padding: 2rem 0;
+        }
+
+        .metric-number {
+            font-family: var(--serif);
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .metric-label {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-top: 0.75rem;
+        }
+
+        .metric-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            line-height: 1.6;
+        }
+
+        /* About Section */
+        .about {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image {
+            aspect-ratio: 4/5;
+            background: linear-gradient(135deg, rgba(197, 165, 111, 0.1), rgba(197, 165, 111, 0.02));
+            border-radius: 1rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .about-image img {
             width: 100%;
             height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            background-image: radial-gradient(rgba(17, 50, 37, 0.18) 1.5px, transparent 1.5px);
-            background-size: 28px 28px;
-            background-position: 0 0;
+            object-fit: cover;
         }
-        /* Ensure page content sits above the dot grid */
-        nav, section, footer {
-            position: relative;
-            z-index: 1;
+
+        .about-content {
+            max-width: 500px;
+        }
+
+        .about-text {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Services Section */
+        .services-list {
+            margin-top: 4rem;
+        }
+
+        .service-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 2rem;
+            align-items: center;
+            padding: 3rem 0;
+            border-top: 1px solid var(--border);
+            transition: all 0.4s;
+        }
+
+        .service-item:last-child {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .service-number {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .service-title {
+            font-family: var(--serif);
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            letter-spacing: -0.02em;
+            transition: color 0.3s;
+        }
+
+        .service-item:hover .service-title {
+            color: var(--accent);
+        }
+
+        .service-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            text-align: right;
+        }
+
+        /* Ecosystem Section */
+        .ecosystem {
+            background: rgba(243, 242, 239, 0.02);
+            border-radius: 2rem;
+            margin: 0 2rem;
+        }
+
+        .ecosystem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-top: 4rem;
+        }
+
+        .ecosystem-content {
+            padding: 2rem;
+            background: var(--bg);
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .ecosystem-tag {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.4rem 0.8rem;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 100px;
+            margin-bottom: 1.5rem;
+        }
+
+        .ecosystem-heading {
+            font-family: var(--serif);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .ecosystem-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .tech-item {
+            padding: 1rem;
+            background: rgba(243, 242, 239, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .tech-item:hover {
+            border-color: rgba(197, 165, 111, 0.3);
+        }
+
+        .tech-name {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        .tech-desc {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Tab Controls */
+        .tab-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            color: var(--text-muted);
+            font-family: var(--sans);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            border-color: rgba(243, 242, 239, 0.2);
+            color: var(--text);
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg);
+        }
+
+        .tab-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.3;
+        }
+
+        .tab-btn.active .tab-dot {
+            opacity: 1;
+        }
+
+        /* Testimonials */
+        .testimonials-wrapper {
+            margin-top: 4rem;
+            max-width: 800px;
+        }
+
+        .testimonial-card {
+            padding: 3rem;
+            background: rgba(243, 242, 239, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .testimonial-quote {
+            font-family: var(--serif);
+            font-size: clamp(1.25rem, 2vw, 1.75rem);
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--bg);
+        }
+
+        .testimonial-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .testimonial-role {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .testimonial-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .testimonial-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .testimonial-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            opacity: 0.3;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .testimonial-dot.active {
+            opacity: 1;
+            background: var(--text);
+        }
+
+        .testimonial-btns {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .testimonial-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .testimonial-btn:hover {
+            border-color: var(--text);
+            background: rgba(243, 242, 239, 0.05);
+        }
+
+        .testimonial-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Contact Section */
+        .contact {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+        }
+
+        .contact-info {
+            max-width: 400px;
+        }
+
+        .contact-details {
+            margin-top: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .contact-icon svg {
+            width: 16px;
+            height: 16px;
+            color: var(--accent);
+        }
+
+        .contact-label {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .contact-value {
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .contact-value a {
+            transition: color 0.3s;
+        }
+
+        .contact-value a:hover {
+            color: var(--accent);
+        }
+
+        /* Form */
+        .contact-form {
+            padding: 3rem;
+            background: rgba(243, 242, 239, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 0.875rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .form-select {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            border-radius: 0.75rem;
+            font-family: var(--sans);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .form-submit:hover {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .form-success {
+            display: none;
+            padding: 1rem;
+            background: rgba(197, 165, 111, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 0.75rem;
+            color: var(--accent);
+            font-size: 0.875rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-success.visible {
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-logo {
+            font-family: var(--serif);
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .footer-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-top: 1rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .footer-social a {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .footer-social a:hover {
+            border-color: var(--accent);
+            background: rgba(197, 165, 111, 0.1);
+        }
+
+        .footer-social svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .footer-heading {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .footer-links a {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        .footer-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 2rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-bottom-links a {
+            transition: color 0.3s;
+        }
+
+        .footer-bottom-links a:hover {
+            color: var(--text);
+        }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s;
+        }
+
+        .mobile-menu.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-menu a {
+            font-family: var(--serif);
+            font-size: 2rem;
+            transition: color 0.3s;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--accent);
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .mobile-menu-close svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .about {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .service-item {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .service-desc {
+                text-align: left;
+            }
+
+            .ecosystem-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links, .nav-cta {
+                display: none;
+            }
+
+            .nav-menu-btn {
+                display: block;
+            }
+
+            .hero-title {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .ecosystem {
+                margin: 0 1rem;
+                padding: 4rem 1.5rem;
+            }
+
+            section {
+                padding: 5rem 1.5rem;
+            }
         }
     </style>
 </head>
-<body class="bg-white text-gray-900 font-sans antialiased overflow-x-hidden">
+<body>
+    <!-- Grain Overlay -->
+    <div class="grain" aria-hidden="true"></div>
 
-    <!-- Infinite Dot Grid Background -->
-    <div class="dot-grid-bg" aria-hidden="true"></div>
-
-    <!-- 1. Navigation Bar (Dynamic Island style with balanced padding) -->
-    <nav id="main-nav" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-5xl bg-brand-dark/95 backdrop-blur-md border border-white/10 rounded-full shadow-2xl transition-all duration-500 ease-out py-3 px-4">
-        <div class="mx-auto flex items-center justify-between">
-            <!-- Logo -->
-            <a href="#home" class="flex items-center space-x-2 text-xl font-extrabold tracking-tight text-white hover:opacity-90 transition-opacity">
-                <span>bitz</span><span class="text-brand-lime">.</span><span>dev</span>
-            </a>
-
-            <!-- Desktop Links -->
-            <div class="hidden md:flex items-center space-x-7 text-sm font-medium text-white/80">
-                <a href="#about" class="hover:text-brand-lime transition-colors">About</a>
-                <a href="#services" class="hover:text-brand-lime transition-colors">Services</a>
-                <a href="#ecosystem" class="hover:text-brand-lime transition-colors">Ecosystem</a>
-                <a href="#testimonials" class="hover:text-brand-lime transition-colors">Client Love</a>
-                <a href="#contact" class="hover:text-brand-lime transition-colors">Contact</a>
-            </div>
-
-            <!-- CTA button (desktop with matching concentric curvature) -->
-            <div class="hidden md:block">
-                <a id="nav-cta" href="#contact" class="px-5 py-2 bg-brand-lime text-brand-dark hover:bg-brand-limeHover font-bold rounded-full text-sm shadow-md hover:scale-[1.03] transition-all duration-500 ease-out inline-block">
-                    Let's Talk
-                </a>
-            </div>
-
-            <!-- Burger menu button (mobile) -->
-            <button type="button" id="menu-toggle" class="md:hidden relative z-[60] flex items-center text-white focus:outline-none p-2 -m-2" aria-label="Toggle menu">
-                <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path id="burger-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    <path id="close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Mobile Drawer menu -->
-        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 mt-2 bg-brand-dark border border-white/10 rounded-3xl py-6 px-6 space-y-4 shadow-2xl transition-all duration-300 transform scale-y-95 origin-top">
-            <a href="#about" class="block text-lg font-medium text-white/90 hover:text-brand-lime transition-colors py-2 border-b border-white/5">About</a>
-            <a href="#services" class="block text-lg font-medium text-white/90 hover:text-brand-lime transition-colors py-2 border-b border-white/5">Services</a>
-            <a href="#ecosystem" class="block text-lg font-medium text-white/90 hover:text-brand-lime transition-colors py-2 border-b border-white/5">Ecosystem</a>
-            <a href="#testimonials" class="block text-lg font-medium text-white/90 hover:text-brand-lime transition-colors py-2 border-b border-white/5">Client Love</a>
-            <a href="#contact" class="block text-lg font-medium text-white/90 hover:text-brand-lime transition-colors py-2 pb-4">Contact</a>
-            <a href="#contact" class="block w-full text-center py-3 bg-brand-lime text-brand-dark hover:bg-brand-limeHover font-bold rounded-full text-base shadow-md">
-                Let's Talk
-            </a>
-        </div>
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="#home" class="nav-logo">bitz.dev</a>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#ecosystem">Ecosystem</a></li>
+            <li><a href="#testimonials">Client Love</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <a href="#contact" class="nav-cta">Let's Talk</a>
+        <button class="nav-menu-btn" id="menu-toggle" aria-label="Toggle menu">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
     </nav>
 
-    <!-- 2. Hero Section -->
-    <section id="home" class="pt-32 pb-20 md:pt-40 md:pb-28 bg-white overflow-hidden">
-        <div class="max-w-7xl mx-auto px-6 text-center">
-            
-            <!-- Headline Title -->
-            <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-brand-dark tracking-tight leading-[1.1] max-w-4xl mx-auto">
-                A new way to build for the <span class="text-brand-sage relative inline-block">Web<span class="absolute bottom-1 left-0 w-full h-2 bg-brand-lime/40 -z-10 rounded-full"></span></span> with precision.
-            </h1>
-            
-            <!-- Subtitle -->
-            <p class="mt-6 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                I engineer highly-optimized, pixel-perfect freelance web solutions. Speed-obsessed development designed to scale businesses, connect services, and convert users.
-            </p>
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <button class="mobile-menu-close" id="menu-close" aria-label="Close menu">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#ecosystem">Ecosystem</a>
+        <a href="#testimonials">Client Love</a>
+        <a href="#contact">Contact</a>
+    </div>
 
-            <!-- Social and Info Pills (App-store styled CTAs) -->
-            <div class="mt-8 flex flex-wrap justify-center gap-4">
-                <!-- Github Button -->
-                <a href="https://github.com/bitzzdev" target="_blank" class="flex items-center space-x-3 px-6 py-3 bg-brand-dark text-white hover:bg-brand-sage rounded-xl transition-all hover:-translate-y-0.5 shadow-lg">
-                    <svg class="w-6 h-6 fill-current text-brand-lime" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                    <div class="text-left">
-                        <p class="text-[10px] text-white/50 uppercase tracking-widest font-semibold font-mono">Check code</p>
-                        <p class="text-sm font-bold">GitHub Portfolio</p>
-                    </div>
-                </a>
-                
-                <!-- Instagram Button -->
-                <a href="https://instagram.com/bitz.dev" target="_blank" class="flex items-center space-x-3 px-6 py-3 bg-brand-dark text-white hover:bg-brand-sage rounded-xl transition-all hover:-translate-y-0.5 shadow-lg">
-                    <svg class="w-6 h-6 fill-current text-brand-lime" viewBox="0 0 24 24">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-                    </svg>
-                    <div class="text-left">
-                        <p class="text-[10px] text-white/50 uppercase tracking-widest font-semibold font-mono">Follow</p>
-                        <p class="text-sm font-bold">Instagram Feed</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Workspace Showcase Container (with rounded borders and active badges matching original photo) -->
-            <div class="mt-16 relative mx-auto max-w-5xl rounded-[2rem] border-8 border-brand-light shadow-2xl overflow-hidden bg-brand-dark aspect-[16/9] flex flex-col justify-between p-6 md:p-10 text-white">
-                
-                <!-- IDE-style top header bar -->
-                <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-3.5 h-3.5 rounded-full bg-red-500"></div>
-                        <div class="w-3.5 h-3.5 rounded-full bg-yellow-400"></div>
-                        <div class="w-3.5 h-3.5 rounded-full bg-brand-lime"></div>
-                        <span class="text-xs text-white/40 ml-4 font-mono">bitz-web-engine // main.js</span>
-                    </div>
-                    <div class="flex items-center space-x-3 text-xs text-white/50 bg-white/5 px-3 py-1.5 rounded-md font-mono">
-                        <span class="w-2 h-2 rounded-full bg-brand-lime inline-block animate-pulse"></span>
-                        <span>Production Live</span>
-                    </div>
-                </div>
-
-                <!-- Custom Aesthetic Mockup Content (Simulated Code) -->
-                <div class="flex-grow flex flex-col items-center justify-between gap-8 py-4">
-                    <!-- Left: Real Mock Code -->
-                    <div class="w-full text-left font-mono text-xs sm:text-sm text-white/80 space-y-2 overflow-x-auto select-none bg-brand-darker p-4 sm:p-6 rounded-2xl border border-white/5">
-                        <p><span class="text-brand-lime">import</span> { <span class="text-amber-300">WebArchitect</span> } <span class="text-brand-lime">from</span> <span class="text-green-400">'bitz-dev'</span>;</p>
-                        <p><span class="text-brand-lime">const</span> clientPortfolio = <span class="text-brand-lime">new</span> <span class="text-amber-300">WebArchitect</span>({</p>
-                        <p class="pl-4">developer: <span class="text-green-400">"Bitupan Borah"</span>,</p>
-                        <p class="pl-4">focus: <span class="text-green-400">"Frontend Engineering & Precision UI"</span>,</p>
-                        <p class="pl-4">speedMetric: <span class="text-cyan-400">"Perfect Core Web Vitals"</span>,</p>
-                        <p class="pl-4">status: <span class="text-brand-lime">"AVAILABLE_FOR_HIRE"</span></p>
-                        <p>});</p>
-                        <p class="mt-4 text-white/30">// Initiating high-conversion layout...</p>
-                        <p>clientPortfolio.<span class="text-emerald-400">buildFuture</span>();</p>
-                    </div>
-                </div>
-
-                <!-- Floating Overlays mimicking original design -->
-                <!-- Overlay 1: 30+ Delivered Badge (Bottom Left) -->
-                <div class="absolute bottom-4 left-4 md:bottom-8 md:left-8 bg-white text-gray-900 px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-3 border border-brand-light">
-                    <div class="flex -space-x-2">
-                        <div class="w-7 h-7 rounded-full bg-brand-dark text-white font-bold text-[9px] flex items-center justify-center border border-white">C1</div>
-                        <div class="w-7 h-7 rounded-full bg-brand-sage text-white font-bold text-[9px] flex items-center justify-center border border-white">C2</div>
-                        <div class="w-7 h-7 rounded-full bg-brand-lime text-brand-dark font-bold text-[9px] flex items-center justify-center border border-white">C3</div>
-                    </div>
-                    <div class="text-left">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none">Delivered</p>
-                        <p class="text-xs font-extrabold text-brand-dark">30+ Global Projects</p>
-                    </div>
-                </div>
-
-                <!-- Overlay 2: Available Status (Bottom Right) -->
-                <div class="absolute bottom-4 right-4 md:bottom-8 md:right-8 bg-white text-gray-900 px-4 py-3 rounded-2xl shadow-xl flex items-center space-2.5 border border-brand-light">
-                    <span class="relative flex h-3 w-3">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                    </span>
-                    <span class="text-xs font-bold text-brand-dark">Available for Projects</span>
-                </div>
-            </div>
-            
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <span class="hero-eyebrow">Freelance Frontend Developer</span>
+        <h1 class="hero-title">A new way to build for the <em>Web</em> with precision.</h1>
+        <p class="hero-sub">I engineer highly-optimized, pixel-perfect freelance web solutions. Speed-obsessed development designed to scale businesses, connect services, and convert users.</p>
+        <div class="hero-cta-row">
+            <a href="#contact" class="btn-primary">
+                Start a Project
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+            </a>
+            <a href="https://github.com/bitzzdev" target="_blank" class="btn-secondary">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub
+            </a>
         </div>
+        <span class="hero-scroll">Scroll to explore</span>
     </section>
 
-    <section id='founder' class='py-20 bg-white'><div class='max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center'><div class='flex justify-center'><img src='favicon.png' alt='Bitupan Borah' class='w-full max-w-lg rounded-3xl shadow-2xl border-8 border-white object-cover mx-auto'></div><div class='text-center lg:text-left'><h2 class='text-4xl font-extrabold text-brand-dark'>Hi, I'm Bitupan Borah.</h2><p class='mt-6 text-gray-600'> I handle every stage of your website personally, giving you direct communication, faster decisions, and complete accountability.</p><a href='#contact' class='inline-block mt-6 px-6 py-3 bg-brand-dark text-white rounded-full'>Start a Project</a></div></div></section>
-<!-- 3. Metrics Section -->
-    <section class="py-12 bg-brand-light/35 border-y border-brand-light">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-                <!-- Stat 1 -->
-                <div class="text-center md:text-left">
-                    <h2 class="text-4xl md:text-5xl font-extrabold text-brand-dark">100%</h2>
-                    <p class="mt-2 text-sm font-semibold text-brand-sage uppercase tracking-wider font-mono">Satisfaction</p>
-                    <p class="mt-1 text-xs text-gray-500"> client receives dedicated high-end support and precise engineering.</p>
-                </div>
-                <!-- Stat 2 -->
-                <div class="text-center md:text-left border-l border-gray-200/50 pl-0 md:pl-8">
-                    <h2 class="text-4xl md:text-5xl font-extrabold text-brand-dark">40+</h2>
-                    <p class="mt-2 text-sm font-semibold text-brand-sage uppercase tracking-wider font-mono">Custom Deployments</p>
-                    <p class="mt-1 text-xs text-gray-500">From high-performance SaaS platforms to custom commerce architectures.</p>
-                </div>
-                <!-- Stat 3 -->
-                <div class="text-center md:text-left border-l border-gray-200/50 pl-0 md:pl-8">
-                    <h2 class="text-4xl md:text-5xl font-extrabold text-brand-dark">3x</h2>
-                    <p class="mt-2 text-sm font-semibold text-brand-sage uppercase tracking-wider font-mono">Load Speed Boost</p>
-                    <p class="mt-1 text-xs text-gray-500">Lightweight build tooling, code splitting, and extreme CDN performance.</p>
-                </div>
-                <!-- Stat 4 -->
-                <div class="text-center md:text-left border-l border-gray-200/50 pl-0 md:pl-8">
-                    <h2 class="text-4xl md:text-5xl font-extrabold text-brand-dark">24/7</h2>
-                    <p class="mt-2 text-sm font-semibold text-brand-sage uppercase tracking-wider font-mono">Active Support</p>
-                    <p class="mt-1 text-xs text-gray-500">Unmatched post-launch assistance and direct feedback loops.</p>
-                </div>
+    <!-- Metrics Section -->
+    <section class="metrics">
+        <div class="metrics-grid">
+            <div class="metric-item reveal">
+                <div class="metric-number">100%</div>
+                <div class="metric-label">Satisfaction</div>
+                <div class="metric-desc">Client receives dedicated high-end support and precise engineering.</div>
+            </div>
+            <div class="metric-item reveal">
+                <div class="metric-number">40+</div>
+                <div class="metric-label">Custom Deployments</div>
+                <div class="metric-desc">From high-performance SaaS platforms to custom commerce architectures.</div>
+            </div>
+            <div class="metric-item reveal">
+                <div class="metric-number">3x</div>
+                <div class="metric-label">Load Speed Boost</div>
+                <div class="metric-desc">Lightweight build tooling, code splitting, and extreme CDN performance.</div>
+            </div>
+            <div class="metric-item reveal">
+                <div class="metric-number">24/7</div>
+                <div class="metric-label">Active Support</div>
+                <div class="metric-desc">Unmatched post-launch assistance and direct feedback loops.</div>
             </div>
         </div>
     </section>
 
-    <!-- 4. Philosophy Section -->
-    <section id="about" class="py-20 md:py-28 bg-white">
-        <div class="max-w-7xl mx-auto px-6 text-center">
-            
-            <h2 class="text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight">
-                No Complexity. No Noise. Just Exceptional Code.
-            </h2>
-            <p class="mt-4 text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
-                Websites shouldn't be sluggish piles of over-engineered templates. I work in the trenches of pure code, streamlining system designs so your clients load your product in milliseconds.
-            </p>
-
-            <div class="mt-8">
-                <a href="#services" class="inline-flex items-center space-x-2 px-6 py-3 bg-brand-lime text-brand-dark hover:bg-brand-limeHover font-bold rounded-full text-sm shadow-md transition-all hover:scale-[1.03]">
-                    <span>Learn More</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                    </svg>
-                </a>
+    <!-- About Section -->
+    <section id="about">
+        <div class="about">
+            <div class="about-image reveal">
+                <img src="favicon.png" alt="Bitupan Borah">
             </div>
-
-            <!-- Massive Background Showcase Frame (Rounded mockup) -->
-            <div class="mt-16 rounded-[2rem] bg-brand-light border border-gray-200/60 overflow-hidden shadow-lg p-4 sm:p-8">
-                <div class="bg-white rounded-2xl p-6 shadow-inner text-left">
-                    <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-3 h-3 rounded-full bg-red-400"></span>
-                            <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
-                            <span class="w-3 h-3 rounded-full bg-green-400"></span>
-                        </div>
-                        <span class="text-xs text-gray-400 font-mono">https://analytics.bitz.dev</span>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Card 1 -->
-                        <div class="p-6 bg-brand-light rounded-xl border border-gray-200/35">
-                            <p class="text-xs font-bold text-brand-sage uppercase tracking-wider font-mono">Web Performance</p>
-                            <p class="text-3xl font-extrabold text-brand-dark mt-2">100/100</p>
-                            <p class="text-xs text-gray-500 mt-1">Google PageSpeed Insights Score</p>
-                        </div>
-                        <!-- Card 2 -->
-                        <div class="p-6 bg-brand-light rounded-xl border border-gray-200/35">
-                            <p class="text-xs font-bold text-brand-sage uppercase tracking-wider font-mono">SEO Optimization</p>
-                            <p class="text-3xl font-extrabold text-brand-dark mt-2">Perfect</p>
-                            <p class="text-xs text-gray-500 mt-1">Structured Rich Snippets and Metadata</p>
-                        </div>
-                        <!-- Card 3 -->
-                        <div class="p-6 bg-brand-light rounded-xl border border-gray-200/35">
-                            <p class="text-xs font-bold text-brand-sage uppercase tracking-wider font-mono">TTFB (Time to First Byte)</p>
-                            <p class="text-3xl font-extrabold text-brand-dark mt-2">&lt; 0.1s</p>
-                            <p class="text-xs text-gray-500 mt-1">Lightning-fast edge delivery worldwide</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- 5. Services Grid Section -->
-    <section id="services" class="py-20 md:py-28 bg-brand-light">
-        <div class="max-w-7xl mx-auto px-6">
-            
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight">
-                    Smart Solutions for a Greener Tomorrow.
-                </h2>
-                <p class="mt-4 text-gray-600 text-sm md:text-base">
-                    As an agile freelance engineer, I provide production-grade web solutions tailored specifically to help businesses automate operations, scale platforms, and secure high-value conversions.
-                </p>
-            </div>
-
-            <!-- Grid matching the elegant layouts of the original -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                <!-- Service Card 1 -->
-                <div class="bg-white rounded-[2rem] p-8 shadow-md border border-gray-100 flex flex-col md:flex-row gap-6 hover:shadow-xl transition-all hover:-translate-y-1">
-                    <div class="w-16 h-16 rounded-2xl bg-brand-light flex-shrink-0 flex items-center justify-center text-brand-dark border border-brand-cardBg/60">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+            <div class="about-content">
+                <span class="section-label">About</span>
+                <h2 class="section-title">Hi, I'm Bitupan Borah.</h2>
+                <p class="about-text">I handle every stage of your website personally, giving you direct communication, faster decisions, and complete accountability. No complexity. No noise. Just exceptional code.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="#contact" class="btn-primary">
+                        Start a Project
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
-                    </div>
-                    <div>
-                        <span class="text-[10px] font-bold font-mono tracking-wider text-brand-sage uppercase block mb-1">Tailored Apps</span>
-                        <h3 class="text-xl font-bold text-brand-dark">Custom Web Applications</h3>
-                        <p class="text-gray-500 text-sm mt-2 leading-relaxed">
-                            Robust, interactive Single Page Applications tailored with modern JavaScript ecosystems. Built to deliver exceptional user experiences with fluid animations and performance.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Service Card 2 -->
-                <div class="bg-white rounded-[2rem] p-8 shadow-md border border-gray-100 flex flex-col md:flex-row gap-6 hover:shadow-xl transition-all hover:-translate-y-1">
-                    <div class="w-16 h-16 rounded-2xl bg-brand-light flex-shrink-0 flex items-center justify-center text-brand-dark border border-brand-cardBg/60">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <span class="text-[10px] font-bold font-mono tracking-wider text-brand-sage uppercase block mb-1">Pixel Perfect</span>
-                        <h3 class="text-xl font-bold text-brand-dark">UI/UX Responsive Design</h3>
-                        <p class="text-gray-500 text-sm mt-2 leading-relaxed">
-                            Mobile-first design schemas. I craft intuitive user interfaces with fluid animations, cohesive color systems, and optimal conversion journeys that feel incredibly natural.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Service Card 3 -->
-                <div class="bg-white rounded-[2rem] p-8 shadow-md border border-gray-100 flex flex-col md:flex-row gap-6 hover:shadow-xl transition-all hover:-translate-y-1">
-                    <div class="w-16 h-16 rounded-2xl bg-brand-light flex-shrink-0 flex items-center justify-center text-brand-dark border border-brand-cardBg/60">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <span class="text-[10px] font-bold font-mono tracking-wider text-brand-sage uppercase block mb-1">Optimizations</span>
-                        <h3 class="text-xl font-bold text-brand-dark">Performance & SEO Auditing</h3>
-                        <p class="text-gray-500 text-sm mt-2 leading-relaxed">
-                            Eliminating script bloat, structural bottlenecks, and optimizing media. High Core Web Vital compliance to rank your services at the very top of Google organic metrics.
-                        </p>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-    </section>
-
-    <!-- 6. Core Pillars Section -->
-    <section class="py-20 md:py-28 bg-white border-t border-brand-light">
-        <div class="max-w-7xl mx-auto px-6">
-            
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <!-- Pillar 1 -->
-                <div class="p-8 bg-brand-light/45 rounded-3xl border border-brand-light">
-                    <div class="w-12 h-12 rounded-xl bg-brand-dark flex items-center justify-center text-brand-lime">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-extrabold text-brand-dark mt-6">Mission for Today</h3>
-                    <p class="text-gray-500 text-sm mt-3 leading-relaxed">
-                        To bring enterprise-grade web architecture, pixel-perfect detail, and speed-optimized designs directly to freelancers, startups, and growing commercial companies.
-                    </p>
-                </div>
-                <!-- Pillar 2 -->
-                <div class="p-8 bg-brand-light/45 rounded-3xl border border-brand-light">
-                    <div class="w-12 h-12 rounded-xl bg-brand-dark flex items-center justify-center text-brand-lime">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-extrabold text-brand-dark mt-6">Vision for Tomorrow</h3>
-                    <p class="text-gray-500 text-sm mt-3 leading-relaxed">
-                        Pioneering ultra-clean, modular coding standardizations that make managing and deploying websites effortless, drastically cutting resource usage and developer overhead.
-                    </p>
-                </div>
-                <!-- Pillar 3 -->
-                <div class="p-8 bg-brand-light/45 rounded-3xl border border-brand-light">
-                    <div class="w-12 h-12 rounded-xl bg-brand-dark flex items-center justify-center text-brand-lime">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-extrabold text-brand-dark mt-6">Values in Code</h3>
-                    <p class="text-gray-500 text-sm mt-3 leading-relaxed">
-                        Total integrity. Full transparency. Speed optimization as a standard, not an upgrade. Reusable web components that make future extensions simple and intuitive.
-                    </p>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- 7. Interactive Developer Ecosystem (Tab Switcher) -->
-    <section id="ecosystem" class="py-20 md:py-28 bg-brand-dark text-white rounded-[2.5rem] my-10 mx-4 md:mx-10 overflow-hidden">
-        <div class="max-w-7xl mx-auto px-6">
-            
-            <div class="flex flex-col lg:flex-row items-start justify-between gap-12">
-                <!-- Info Left -->
-                <div class="w-full lg:w-2/5">
-                    <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
-                        The frontend ecosystem of <span class="text-brand-lime">bitz.dev</span>
-                    </h2>
-                    <p class="mt-4 text-white/70 text-sm md:text-base leading-relaxed">
-                        I build using strict modern standards, structuring robust frontend environments and modular deployment pipelines that guarantee top performance.
-                    </p>
-                    
-                    <!-- Interactive Tab Controls -->
-                    <div class="mt-8 flex flex-col gap-3 font-mono">
-                        <button id="tab-frontend" class="tab-btn w-full text-left px-5 py-3.5 bg-brand-lime text-brand-dark font-bold rounded-xl flex items-center justify-between border border-brand-lime transition-all duration-200">
-                            <span>1. The Frontend Stack</span>
-                            <span class="w-2 h-2 rounded-full bg-brand-dark"></span>
-                        </button>
-                        <button id="tab-devops" class="tab-btn w-full text-left px-5 py-3.5 bg-transparent text-white/75 hover:text-white font-bold rounded-xl flex items-center justify-between border border-white/10 hover:border-white/20 transition-all duration-200">
-                            <span>2. DevOps & Scale</span>
-                            <span class="w-2 h-2 rounded-full bg-white/20"></span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Interactive Display Right -->
-                <div class="w-full lg:w-3/5 bg-brand-darker border border-white/10 rounded-3xl p-6 sm:p-10 flex flex-col justify-between min-h-[400px]">
-                    
-                    <div id="ecosystem-content" class="transition-opacity duration-300">
-                        <!-- Initial Content (Frontend Stack) -->
-                        <div>
-                            <div class="flex items-center space-x-3 mb-6">
-                                <span class="px-3 py-1 bg-brand-lime/10 border border-brand-lime/30 text-brand-lime text-xs font-bold rounded-full font-mono">React / JS</span>
-                                <h3 class="text-xl font-bold">Intuitive, Blazing Fast Interfaces</h3>
-                            </div>
-                            <p class="text-white/70 text-sm leading-relaxed mb-6">
-                                The visual tier is optimized for high conversion. We employ lightweight components, custom Tailwind themes, and modular components that load instantly. Perfect Core Web Vitals is our standard.
-                            </p>
-                            
-                            <!-- Visual Graphic Representation -->
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/5">
-                                <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                    <p class="text-xs font-bold text-brand-lime font-mono">JS / TS</p>
-                                    <p class="text-[10px] text-white/40 mt-1">Robust Logic</p>
-                                </div>
-                                <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                    <p class="text-xs font-bold text-brand-lime font-mono">Tailwind</p>
-                                    <p class="text-[10px] text-white/40 mt-1">Responsive Utility</p>
-                                </div>
-                                <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                    <p class="text-xs font-bold text-brand-lime font-mono">Vite / ESB</p>
-                                    <p class="text-[10px] text-white/40 mt-1">Blazing Bundles</p>
-                                </div>
-                                <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                    <p class="text-xs font-bold text-brand-lime font-mono">A11y / SEO</p>
-                                    <p class="text-[10px] text-white/40 mt-1">Max Accessibility</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- 8. Testimonials Section -->
-    <section id="testimonials" class="py-20 md:py-28 bg-white overflow-hidden">
-        <div class="max-w-5xl mx-auto px-6 text-center">
-            
-            <div class="max-w-2xl mx-auto mb-16">
-                <h2 class="text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight">
-                    Trusted by ambitious clients.
-                </h2>
-                <p class="mt-4 text-gray-500 text-sm md:text-base">
-                    Read how my precise web engineering and professional communication model solve business issues in record times.
-                </p>
-            </div>
-
-            <!-- Main Testimonials Box (Slider styling) -->
-            <div class="bg-brand-light/60 rounded-[2rem] border border-brand-cardBg/40 p-8 md:p-14 text-left relative min-h-[280px] flex flex-col justify-between">
-                
-                <!-- Quote text with dynamic opacity class -->
-                <div id="testimonial-quote" class="transition-opacity duration-300">
-                    <p class="text-lg md:text-xl font-medium text-brand-dark italic leading-relaxed">
-                        "Bitupan's work was exceptional. He rewritten our entire web interface using custom-tailored elements. Our loading speeds went from 4.2 seconds to under 0.8 seconds, and organic checkouts spiked by 35% within the first month itself."
-                    </p>
-                    
-                    <!-- User Meta -->
-                    <div class="flex items-center space-x-4 mt-8">
-                        <div class="w-12 h-12 rounded-full bg-brand-dark text-brand-lime font-bold text-sm flex items-center justify-center">
-                            JS
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-brand-dark text-base">Johnathan S.</h4>
-                            <p class="text-xs text-gray-500 font-mono">SaaS Founder, Austin TX</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Navigation Controls -->
-                <div class="flex items-center justify-between border-t border-brand-cardBg/80 pt-6 mt-8">
-                    <!-- Nav indicators (Dots) -->
-                    <div class="flex space-x-2">
-                        <span class="test-dot w-2 h-2 rounded-full bg-brand-dark transition-all duration-300"></span>
-                        <span class="test-dot w-2 h-2 rounded-full bg-gray-300 transition-all duration-300"></span>
-                        <span class="test-dot w-2 h-2 rounded-full bg-gray-300 transition-all duration-300"></span>
-                    </div>
-                    
-                    <!-- Prev/Next Buttons -->
-                    <div class="flex space-x-3">
-                        <button id="slider-prev" class="w-11 h-11 bg-white hover:bg-brand-light border border-gray-200 text-brand-dark rounded-full flex items-center justify-center transition-all shadow-sm" aria-label="Previous testimonial">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
-                            </svg>
-                        </button>
-                        <button id="slider-next" class="w-11 h-11 bg-white hover:bg-brand-light border border-gray-200 text-brand-dark rounded-full flex items-center justify-center transition-all shadow-sm" aria-label="Next testimonial">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-    </section>
-
-    <!-- 9. Form & Lead Capture (CTA) -->
-    <section id="contact" class="py-20 md:py-28 bg-brand-light">
-        <div class="max-w-7xl mx-auto px-6">
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                
-                <!-- Info text Left -->
-                <div>
-                    <h2 class="text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight">
-                        Grow with Confidence, Grow with Innovation.
-                    </h2>
-                    <p class="mt-4 text-gray-600 text-sm md:text-base leading-relaxed">
-                        Ready to elevate your digital presence? Let's talk about how we can build clean systems, speed up your codebase, and deliver absolute utility to your users. 
-                    </p>
-                    
-                    <div class="mt-8 space-y-4 font-mono text-sm text-brand-sage">
-                        <div class="flex items-center space-x-3">
-                            <svg class="w-5 h-5 text-brand-dark flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
-                            <a href="mailto:bitupanborah1k@gmail.com" class="hover:underline text-brand-dark font-bold">bitupanborah1k@gmail.com</a>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <svg class="w-5 h-5 text-brand-dark flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                            </svg>
-                            <a href="tel:+916002128705" class="hover:underline text-brand-dark font-bold">+91 60021 28705</a>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <svg class="w-5 h-5 text-brand-dark flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <span class="text-brand-dark font-bold">Assam, India (Available Globally)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Interactive Form Right -->
-                <div class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-xl border border-gray-100">
-                    <form id="contact-form" class="space-y-5">
-                        
-                        <!-- Form Success Message -->
-                        <div id="form-success" class="hidden p-4 bg-green-50 border border-green-200 text-green-800 rounded-xl flex items-center space-x-3 text-sm">
-                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span>Thank you! Your message was sent successfully. Bitz will connect shortly.</span>
-                        </div>
-
-                        <!-- Name field -->
-                        <div>
-                            <label for="form-name" class="block text-xs font-bold text-brand-sage uppercase font-mono mb-2">Full Name</label>
-                            <input type="text" id="form-name" name="name" required placeholder="e.g. Alex Rivera" class="w-full px-4 py-3 bg-brand-light border border-gray-200 focus:border-brand-dark rounded-xl focus:outline-none transition-colors text-sm">
-                        </div>
-
-                        <!-- Email field -->
-                        <div>
-                            <label for="form-email" class="block text-xs font-bold text-brand-sage uppercase font-mono mb-2">Email Address</label>
-                            <input type="email" id="form-email" name="email" required placeholder="alex@company.com" class="w-full px-4 py-3 bg-brand-light border border-gray-200 focus:border-brand-dark rounded-xl focus:outline-none transition-colors text-sm">
-                        </div>
-
-                        <!-- Project Type field -->
-                        <div>
-                            <label for="form-project" class="block text-xs font-bold text-brand-sage uppercase font-mono mb-2">Project Type</label>
-                            <select id="form-project" name="project" class="w-full px-4 py-3 bg-brand-light border border-gray-200 focus:border-brand-dark rounded-xl focus:outline-none transition-colors text-sm text-gray-700">
-                                <option value="custom-app">Custom Web Application</option>
-                                <option value="uiux-design">UI/UX Interface Design</option>
-                                <option value="performance-audit">Speed & Performance tuning</option>
-                                <option value="frontend-dev">Frontend Development</option>
-                            </select>
-                        </div>
-
-                        <!-- Message field -->
-                        <div>
-                            <label for="form-message" class="block text-xs font-bold text-brand-sage uppercase font-mono mb-2">Project Brief</label>
-                            <textarea id="form-message" name="message" rows="4" required placeholder="Let me know how I can add absolute value to your project..." class="w-full px-4 py-3 bg-brand-light border border-gray-200 focus:border-brand-dark rounded-xl focus:outline-none transition-colors text-sm"></textarea>
-                        </div>
-
-                        <!-- Submit button -->
-                        <button type="submit" id="form-submit" class="w-full py-4 bg-brand-lime hover:bg-brand-limeHover text-brand-dark font-extrabold text-sm rounded-xl transition-all shadow-md flex items-center justify-center space-x-2">
-                            <span>Submit Brief</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                            </svg>
-                        </button>
-                    </form>
-                </div>
-
-            </div>
-
-        </div>
-    </section>
-
-    <!-- 10. Rich Footer Section -->
-    <footer class="bg-brand-dark text-white pt-16 pb-8 border-t border-white/5">
-        <div class="max-w-7xl mx-auto px-6">
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/5">
-                <!-- Branding column -->
-                <div class="lg:col-span-1">
-                    <a href="#home" class="text-2xl font-extrabold tracking-tight text-white flex items-center space-x-1">
-                        <span>bitz</span><span class="text-brand-lime">.</span><span>dev</span>
                     </a>
-                    <p class="text-white/60 text-xs mt-4 leading-relaxed">
-                        High-performance engineering structures and tailored pixel-perfection. Providing absolute code integrity to growing enterprises globally.
-                    </p>
-                    <!-- Social icons matching inspo -->
-                    <div class="flex items-center space-x-3.5 mt-6">
-                        <!-- Github -->
-                        <a href="https://github.com" target="_blank" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors" aria-label="GitHub">
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                            </svg>
-                        </a>
-                        <!-- Instagram -->
-                        <a href="https://instagram.com/bitz.dev" target="_blank" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors" aria-label="Instagram">
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-                            </svg>
-                        </a>
-                        <!-- Email -->
-                        <a href="mailto:bitupanborah1k@gmail.com" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors" aria-label="Email">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
-                        </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section>
+        <div class="reveal">
+            <span class="section-label">Philosophy</span>
+            <h2 class="section-title">No Complexity. No Noise. Just Exceptional Code.</h2>
+            <p class="section-text">Websites shouldn't be sluggish piles of over-engineered templates. I work in the trenches of pure code, streamlining system designs so your clients load your product in milliseconds.</p>
+        </div>
+        <div class="reveal" style="margin-top: 4rem; padding: 3rem; background: rgba(243, 242, 239, 0.02); border: 1px solid var(--border); border-radius: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+                <div>
+                    <div style="font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;">Web Performance</div>
+                    <div style="font-family: var(--serif); font-size: 2.5rem;">100/100</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Google PageSpeed Insights Score</div>
+                </div>
+                <div>
+                    <div style="font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;">SEO Optimization</div>
+                    <div style="font-family: var(--serif); font-size: 2.5rem;">Perfect</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Structured Rich Snippets and Metadata</div>
+                </div>
+                <div>
+                    <div style="font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;">TTFB</div>
+                    <div style="font-family: var(--serif); font-size: 2.5rem;">&lt; 0.1s</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Lightning-fast edge delivery worldwide</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="reveal">
+            <span class="section-label">Services</span>
+            <h2 class="section-title">Smart Solutions for a Greener Tomorrow.</h2>
+            <p class="section-text">As an agile freelance engineer, I provide production-grade web solutions tailored specifically to help businesses automate operations, scale platforms, and secure high-value conversions.</p>
+        </div>
+        <div class="services-list">
+            <div class="service-item reveal">
+                <span class="service-number">01</span>
+                <h3 class="service-title">Custom Web Applications</h3>
+                <p class="service-desc">Robust, interactive Single Page Applications tailored with modern JavaScript ecosystems. Built to deliver exceptional user experiences with fluid animations and performance.</p>
+            </div>
+            <div class="service-item reveal">
+                <span class="service-number">02</span>
+                <h3 class="service-title">UI/UX Responsive Design</h3>
+                <p class="service-desc">Mobile-first design schemas. I craft intuitive user interfaces with fluid animations, cohesive color systems, and optimal conversion journeys that feel incredibly natural.</p>
+            </div>
+            <div class="service-item reveal">
+                <span class="service-number">03</span>
+                <h3 class="service-title">Performance & SEO Auditing</h3>
+                <p class="service-desc">Eliminating script bloat, structural bottlenecks, and optimizing media. High Core Web Vital compliance to rank your services at the very top of Google organic metrics.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ecosystem Section -->
+    <section id="ecosystem" class="ecosystem">
+        <div class="reveal">
+            <span class="section-label">Ecosystem</span>
+            <h2 class="section-title">The frontend ecosystem of <span style="color: var(--accent);">bitz.dev</span></h2>
+            <p class="section-text">I build using strict modern standards, structuring robust frontend environments and modular deployment pipelines that guarantee top performance.</p>
+        </div>
+        <div class="ecosystem-grid">
+            <div class="tab-controls reveal">
+                <button class="tab-btn active" data-tab="frontend">
+                    <span>1. The Frontend Stack</span>
+                    <span class="tab-dot"></span>
+                </button>
+                <button class="tab-btn" data-tab="devops">
+                    <span>2. DevOps & Scale</span>
+                    <span class="tab-dot"></span>
+                </button>
+            </div>
+            <div class="ecosystem-content reveal" id="ecosystem-content">
+                <span class="ecosystem-tag">React / JS</span>
+                <h3 class="ecosystem-heading">Intuitive, Blazing Fast Interfaces</h3>
+                <p class="ecosystem-text">The visual tier is optimized for high conversion. We employ lightweight components, custom Tailwind themes, and modular components that load instantly. Perfect Core Web Vitals is our standard.</p>
+                <div class="tech-grid">
+                    <div class="tech-item">
+                        <div class="tech-name">JS / TS</div>
+                        <div class="tech-desc">Robust Logic</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">Tailwind</div>
+                        <div class="tech-desc">Responsive Utility</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">Vite / ESB</div>
+                        <div class="tech-desc">Blazing Bundles</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">A11y / SEO</div>
+                        <div class="tech-desc">Max Accessibility</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <!-- Quick links Column -->
-                <div>
-                    <h4 class="text-sm font-bold text-brand-lime font-mono uppercase tracking-wider mb-4">Quick Links</h4>
-                    <ul class="space-y-2.5 text-xs text-white/70">
-                        <li><a href="#home" class="hover:text-brand-lime transition-colors">Home</a></li>
-                        <li><a href="#about" class="hover:text-brand-lime transition-colors">About Us</a></li>
-                        <li><a href="#services" class="hover:text-brand-lime transition-colors">Solutions</a></li>
-                        <li><a href="#ecosystem" class="hover:text-brand-lime transition-colors">Ecosystem</a></li>
-                        <li><a href="#contact" class="hover:text-brand-lime transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-
-                <!-- Services List Column -->
-                <div>
-                    <h4 class="text-sm font-bold text-brand-lime font-mono uppercase tracking-wider mb-4">Solutions</h4>
-                    <ul class="space-y-2.5 text-xs text-white/70">
-                        <li>Custom Web Applications</li>
-                        <li>UI/UX Interfaces</li>
-                        <li>SEO Auditing</li>
-                        <li>Headless CMS Deployments</li>
-                        <li>Advanced Frontend Logic</li>
-                        <li>Performance Optimizations</li>
-                    </ul>
-                </div>
-
-                <!-- Direct Contact info -->
-                <div>
-                    <h4 class="text-sm font-bold text-brand-lime font-mono uppercase tracking-wider mb-4">Contact Direct</h4>
-                    <ul class="space-y-3 text-xs text-white/70 font-mono">
-                        <li class="flex items-center space-x-2">
-                            <svg class="w-4 h-4 text-brand-lime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
-                            <a href="mailto:bitupanborah1k@gmail.com" class="hover:underline">bitupanborah1k@gmail.com</a>
-                        </li>
-                        <li class="flex items-center space-x-2">
-                            <svg class="w-4 h-4 text-brand-lime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                            </svg>
-                            <a href="tel:+916002128705" class="hover:underline">+91 60021 28705</a>
-                        </li>
-                        <li class="flex items-center space-x-2">
-                            <svg class="w-4 h-4 text-brand-lime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            </svg>
-                            <span>Assam, India</span>
-                        </li>
-                    </ul>
+    <!-- Testimonials Section -->
+    <section id="testimonials">
+        <div class="reveal">
+            <span class="section-label">Testimonials</span>
+            <h2 class="section-title">Trusted by ambitious clients.</h2>
+            <p class="section-text">Read how my precise web engineering and professional communication model solve business issues in record times.</p>
+        </div>
+        <div class="testimonials-wrapper reveal">
+            <div class="testimonial-card">
+                <div id="testimonial-quote">
+                    <p class="testimonial-quote">"Bitupan's work was exceptional. He rewritten our entire web interface using custom-tailored elements. Our loading speeds went from 4.2 seconds to under 0.8 seconds, and organic checkouts spiked by 35% within the first month itself."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">JS</div>
+                        <div>
+                            <div class="testimonial-name">Johnathan S.</div>
+                            <div class="testimonial-role">SaaS Founder, Austin TX</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <!-- Lower Footer row -->
-            <div class="mt-8 pt-8 flex flex-col md:flex-row items-center justify-between text-[11px] text-white/40">
-                <p>© 2026 bitz.dev. Handcrafted locally in India. All rights reserved.</p>
-                <div class="flex space-x-4 mt-4 md:mt-0">
-                    <a href="#" class="hover:text-brand-lime transition-colors">Privacy Policy</a>
-                    <a href="#" class="hover:text-brand-lime transition-colors">Terms of Service</a>
+            <div class="testimonial-nav">
+                <div class="testimonial-dots">
+                    <span class="testimonial-dot active" data-index="0"></span>
+                    <span class="testimonial-dot" data-index="1"></span>
+                    <span class="testimonial-dot" data-index="2"></span>
+                </div>
+                <div class="testimonial-btns">
+                    <button class="testimonial-btn" id="slider-prev" aria-label="Previous">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button class="testimonial-btn" id="slider-next" aria-label="Next">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
+        </div>
+    </section>
 
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="contact">
+            <div class="contact-info reveal">
+                <span class="section-label">Contact</span>
+                <h2 class="section-title">Grow with Confidence, Grow with Innovation.</h2>
+                <p class="section-text">Ready to elevate your digital presence? Let's talk about how we can build clean systems, speed up your codebase, and deliver absolute utility to your users.</p>
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="contact-label">Email</div>
+                            <div class="contact-value"><a href="mailto:bitupanborah1k@gmail.com">bitupanborah1k@gmail.com</a></div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="contact-label">Phone</div>
+                            <div class="contact-value"><a href="tel:+916002128705">+91 60021 28705</a></div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="contact-label">Location</div>
+                            <div class="contact-value">Assam, India (Available Globally)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-form reveal">
+                <div id="form-success" class="form-success">Thank you! Your message was sent successfully. Bitz will connect shortly.</div>
+                <form id="contact-form">
+                    <div class="form-group">
+                        <label class="form-label" for="form-name">Full Name</label>
+                        <input type="text" id="form-name" name="name" class="form-input" placeholder="e.g. Alex Rivera" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="form-email">Email Address</label>
+                        <input type="email" id="form-email" name="email" class="form-input" placeholder="alex@company.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="form-project">Project Type</label>
+                        <select id="form-project" name="project" class="form-select form-input">
+                            <option value="custom-app">Custom Web Application</option>
+                            <option value="uiux-design">UI/UX Interface Design</option>
+                            <option value="performance-audit">Speed & Performance Tuning</option>
+                            <option value="frontend-dev">Frontend Development</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="form-message">Project Brief</label>
+                        <textarea id="form-message" name="message" class="form-textarea" placeholder="Let me know how I can add absolute value to your project..." required></textarea>
+                    </div>
+                    <button type="submit" class="form-submit">Submit Brief</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="footer-logo">bitz.dev</div>
+                <p class="footer-desc">High-performance engineering structures and tailored pixel-perfection. Providing absolute code integrity to growing enterprises globally.</p>
+                <div class="footer-social">
+                    <a href="https://github.com/bitzzdev" target="_blank" aria-label="GitHub">
+                        <svg fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                    <a href="https://instagram.com/bitz.dev" target="_blank" aria-label="Instagram">
+                        <svg fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                        </svg>
+                    </a>
+                    <a href="mailto:bitupanborah1k@gmail.com" aria-label="Email">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h4 class="footer-heading">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#ecosystem">Ecosystem</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-heading">Solutions</h4>
+                <ul class="footer-links">
+                    <li><a href="#services">Custom Web Applications</a></li>
+                    <li><a href="#services">UI/UX Interfaces</a></li>
+                    <li><a href="#services">SEO Auditing</a></li>
+                    <li><a href="#services">Performance Optimization</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-heading">Connect</h4>
+                <ul class="footer-links">
+                    <li><a href="mailto:bitupanborah1k@gmail.com">bitupanborah1k@gmail.com</a></li>
+                    <li><a href="tel:+916002128705">+91 60021 28705</a></li>
+                    <li><a href="https://github.com/bitzzdev" target="_blank">GitHub</a></li>
+                    <li><a href="https://instagram.com/bitz.dev" target="_blank">Instagram</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 bitz.dev. Handcrafted locally in India. All rights reserved.</p>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
         </div>
     </footer>
 
-    <!-- Frontend Controller Logic -->
     <script src="app.js"></script>
-    <script>
-        // Dynamic Island nav: shrinks and tightens as the user scrolls down
-        (function () {
-            const nav = document.getElementById('main-nav');
-            const cta = document.getElementById('nav-cta');
-            if (!nav) return;
-            const onScroll = () => {
-                if (window.scrollY > 40) {
-                    nav.classList.add('max-w-3xl', 'py-2', 'top-3');
-                    nav.classList.remove('max-w-5xl', 'py-3', 'top-4');
-                    if (cta) {
-                        cta.classList.add('py-1.5', 'rounded-2xl', 'translate-x-2');
-                        cta.classList.remove('py-2', 'rounded-full', 'translate-x-0');
-                    }
-                } else {
-                    nav.classList.add('max-w-5xl', 'py-3', 'top-4');
-                    nav.classList.remove('max-w-3xl', 'py-2', 'top-3');
-                    if (cta) {
-                        cta.classList.add('py-2', 'rounded-full', 'translate-x-0');
-                        cta.classList.remove('py-1.5', 'rounded-2xl', 'translate-x-2');
-                    }
-                }
-            };
-            window.addEventListener('scroll', onScroll, { passive: true });
-            onScroll();
-        })();
-    </script>
 </body>
 </html>

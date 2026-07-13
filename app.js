@@ -1,134 +1,109 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Initializing app...');
-
-    // ==========================================
-    // 1. Mobile Menu Toggle
-    // ==========================================
+    // Mobile Menu
     const menuToggle = document.getElementById('menu-toggle');
+    const menuClose = document.getElementById('menu-close');
     const mobileMenu = document.getElementById('mobile-menu');
-    const burgerIcon = document.getElementById('burger-icon');
-    const closeIcon = document.getElementById('close-icon');
 
     if (menuToggle && mobileMenu) {
-        menuToggle.addEventListener('click', (e) => {
-            console.log('Menu toggle click detected');
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const isHidden = mobileMenu.classList.contains('hidden');
-            if (isHidden) {
-                console.log('Opening menu');
-                mobileMenu.classList.remove('hidden');
-                if (burgerIcon) burgerIcon.classList.add('hidden');
-                if (closeIcon) closeIcon.classList.remove('hidden');
-            } else {
-                console.log('Closing menu');
-                mobileMenu.classList.add('hidden');
-                if (burgerIcon) burgerIcon.classList.remove('hidden');
-                if (closeIcon) closeIcon.classList.add('hidden');
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    if (menuClose && mobileMenu) {
+        menuClose.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+            document.body.style.overflow = '';
+        });
+    }
+
+    // Close mobile menu on link click
+    mobileMenu?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+            document.body.style.overflow = '';
+        });
+    });
+
+    // Scroll Reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
             }
         });
+    }, { threshold: 0.1 });
 
-        // Close menu when clicking a link
-        const mobileLinks = mobileMenu.querySelectorAll('a');
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                console.log('Mobile link clicked, closing menu');
-                mobileMenu.classList.add('hidden');
-                if (burgerIcon) burgerIcon.classList.remove('hidden');
-                if (closeIcon) closeIcon.classList.add('hidden');
-            });
-        });
-    } else {
-        console.error('Menu elements not found:', { menuToggle, mobileMenu });
-    }
+    reveals.forEach(el => observer.observe(el));
 
-    // ==========================================
-    // 2. Ecosystem Tab Switcher
-    // ==========================================
-    const tabFrontend = document.getElementById('tab-frontend');
-    const tabDevops = document.getElementById('tab-devops');
+    // Ecosystem Tabs
+    const tabBtns = document.querySelectorAll('.tab-btn');
     const ecosystemContent = document.getElementById('ecosystem-content');
 
-    if (tabFrontend && tabDevops && ecosystemContent) {
-        const frontendContent = `
-                            <div>
-                                <div class="flex items-center space-x-3 mb-6">
-                                    <span class="px-3 py-1 bg-brand-lime/10 border border-brand-lime/30 text-brand-lime text-xs font-bold rounded-full font-mono">React / JS</span>
-                                    <h3 class="text-xl font-bold">Intuitive, Blazing Fast Interfaces</h3>
-                                </div>
-                                <p class="text-white/70 text-sm leading-relaxed mb-6">
-                                    The visual tier is optimized for high conversion. We employ lightweight components, custom Tailwind themes, and modular components that load instantly. Perfect Core Web Vitals is our standard.
-                                </p>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/5">
-                                    <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                        <p class="text-xs font-bold text-brand-lime font-mono">JS / TS</p>
-                                        <p class="text-[10px] text-white/40 mt-1">Robust Logic</p>
-                                    </div>
-                                    <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                        <p class="text-xs font-bold text-brand-lime font-mono">Tailwind</p>
-                                        <p class="text-[10px] text-white/40 mt-1">Responsive Utility</p>
-                                    </div>
-                                    <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                        <p class="text-xs font-bold text-brand-lime font-mono">Vite / ESB</p>
-                                        <p class="text-[10px] text-white/40 mt-1">Blazing Bundles</p>
-                                    </div>
-                                    <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                        <p class="text-xs font-bold text-brand-lime font-mono">A11y / SEO</p>
-                                        <p class="text-[10px] text-white/40 mt-1">Max Accessibility</p>
-                                    </div>
-                                </div>
-                            </div>
-        `;
-        const devopsContent = `
-                            <div>
-                                <div class="flex items-center space-x-3 mb-6">
-                                    <span class="px-3 py-1 bg-brand-lime/10 border border-brand-lime/30 text-brand-lime text-xs font-bold rounded-full font-mono">CI/CD / Cloud</span>
-                                    <h3 class="text-xl font-bold">Architecting for Scale & Reliability</h3>
-                                </div>
-                                <p class="text-white/70 text-sm leading-relaxed mb-6">
-                                    I don't just code; I orchestrate. From automated deployment pipelines to edge-computing strategies, I ensure your product remains stable under heavy load and deploys in seconds.
-                                </p>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/5">
-                                    <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                        <p class="text-xs font-bold text-brand-lime font-mono">Docker</p>
-                                        <p class="text-[10px] text-white/40 mt-1">Containerized</p>
-                                    </div>
-                                    <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                        <p class="text-xs font-bold text-brand-lime font-mono">GitHub Act</p>
-                                        <p class="text-[10px] text-white/40 mt-1">Auto-Deployed</p>
-                                    </div>
-                                    <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                        <p class="text-xs font-bold text-brand-lime font-mono">Vercel/AWS</p>
-                                        <p class="text-[10px] text-white/40 mt-1">Edge Delivery</p>
-                                    </div>
-                                    <div class="p-4 bg-white/5 rounded-xl text-center border border-white/5 hover:border-brand-lime/20 transition-all">
-                                        <p class="text-xs font-bold text-brand-lime font-mono">Terraform</p>
-                                        <p class="text-[10px] text-white/40 mt-1">Infra-as-Code</p>
-                                    </div>
-                                </div>
-                            </div>
-        `;
+    const frontendContent = `
+        <span class="ecosystem-tag">React / JS</span>
+        <h3 class="ecosystem-heading">Intuitive, Blazing Fast Interfaces</h3>
+        <p class="ecosystem-text">The visual tier is optimized for high conversion. We employ lightweight components, custom Tailwind themes, and modular components that load instantly. Perfect Core Web Vitals is our standard.</p>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <div class="tech-name">JS / TS</div>
+                <div class="tech-desc">Robust Logic</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Tailwind</div>
+                <div class="tech-desc">Responsive Utility</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Vite / ESB</div>
+                <div class="tech-desc">Blazing Bundles</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">A11y / SEO</div>
+                <div class="tech-desc">Max Accessibility</div>
+            </div>
+        </div>
+    `;
 
-        const switchTab = (activeTab, inactiveTab, content) => {
-            activeTab.classList.add('bg-brand-lime', 'text-brand-dark', 'border-brand-lime');
-            activeTab.classList.remove('bg-transparent', 'text-white/75', 'border-white/10');
-            inactiveTab.classList.remove('bg-brand-lime', 'text-brand-dark', 'border-brand-lime');
-            inactiveTab.classList.add('bg-transparent', 'text-white/75', 'border-white/10');
+    const devopsContent = `
+        <span class="ecosystem-tag">CI/CD / Cloud</span>
+        <h3 class="ecosystem-heading">Architecting for Scale & Reliability</h3>
+        <p class="ecosystem-text">I don't just code; I orchestrate. From automated deployment pipelines to edge-computing strategies, I ensure your product remains stable under heavy load and deploys in seconds.</p>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <div class="tech-name">Docker</div>
+                <div class="tech-desc">Containerized</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">GitHub Act</div>
+                <div class="tech-desc">Auto-Deployed</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Vercel/AWS</div>
+                <div class="tech-desc">Edge Delivery</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Terraform</div>
+                <div class="tech-desc">Infra-as-Code</div>
+            </div>
+        </div>
+    `;
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
             ecosystemContent.style.opacity = '0';
             setTimeout(() => {
-                ecosystemContent.innerHTML = content;
+                ecosystemContent.innerHTML = btn.dataset.tab === 'frontend' ? frontendContent : devopsContent;
                 ecosystemContent.style.opacity = '1';
             }, 300);
-        };
+        });
+    });
 
-        tabFrontend.addEventListener('click', () => switchTab(tabFrontend, tabDevops, frontendContent));
-        tabDevops.addEventListener('click', () => switchTab(tabDevops, tabFrontend, devopsContent));
-    }
-
-    // ==========================================
-    // 3. Testimonials Slider
-    // ==========================================
+    // Testimonials Slider
     const testimonials = [
         {
             quote: "Bitupan's work was exceptional. He rewritten our entire web interface using custom-tailored elements. Our loading speeds went from 4.2 seconds to under 0.8 seconds, and organic checkouts spiked by 35% within the first month itself.",
@@ -153,36 +128,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const quoteEl = document.getElementById('testimonial-quote');
     const prevBtn = document.getElementById('slider-prev');
     const nextBtn = document.getElementById('slider-next');
-    const dots = document.querySelectorAll('.test-dot');
+    const dots = document.querySelectorAll('.testimonial-dot');
     let currentTestimonial = 0;
 
-    if (quoteEl && prevBtn && nextBtn) {
-        const updateSlider = () => {
-            const t = testimonials[currentTestimonial];
-            quoteEl.style.opacity = '0';
-            setTimeout(() => {
-                quoteEl.innerHTML = `
-                    <p class="text-lg md:text-xl font-medium text-brand-dark italic leading-relaxed">
-                        "${t.quote}"
-                    </p>
-                    <div class="flex items-center space-x-4 mt-8">
-                        <div class="w-12 h-12 rounded-full bg-brand-dark text-brand-lime font-bold text-sm flex items-center justify-center">
-                            ${t.initials}
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-brand-dark text-base">${t.name}</h4>
-                            <p class="text-xs text-gray-500 font-mono">${t.role}</p>
-                        </div>
+    const updateSlider = () => {
+        const t = testimonials[currentTestimonial];
+        quoteEl.style.opacity = '0';
+        setTimeout(() => {
+            quoteEl.innerHTML = `
+                <p class="testimonial-quote">"${t.quote}"</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">${t.initials}</div>
+                    <div>
+                        <div class="testimonial-name">${t.name}</div>
+                        <div class="testimonial-role">${t.role}</div>
                     </div>
-                `;
-                quoteEl.style.opacity = '1';
-            }, 300);
-            dots.forEach((dot, idx) => {
-                dot.classList.toggle('bg-brand-dark', idx === currentTestimonial);
-                dot.classList.toggle('bg-gray-300', idx !== currentTestimonial);
-            });
-        };
+                </div>
+            `;
+            quoteEl.style.opacity = '1';
+        }, 300);
+        dots.forEach((dot, idx) => {
+            dot.classList.toggle('active', idx === currentTestimonial);
+        });
+    };
 
+    if (prevBtn && nextBtn) {
         prevBtn.addEventListener('click', () => {
             currentTestimonial = (currentTestimonial - 1 + testimonials.length) % testimonials.length;
             updateSlider();
@@ -191,17 +161,20 @@ document.addEventListener('DOMContentLoaded', () => {
             currentTestimonial = (currentTestimonial + 1) % testimonials.length;
             updateSlider();
         });
-        updateSlider();
     }
 
-    // ==========================================
-    // 4. Contact Form
-    // ==========================================
+    dots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            currentTestimonial = parseInt(dot.dataset.index);
+            updateSlider();
+        });
+    });
+
+    // Contact Form
     const contactForm = document.getElementById('contact-form');
     const formSuccess = document.getElementById('form-success');
-    const formSubmit = document.getElementById('form-submit');
 
-    if (contactForm && formSubmit) {
+    if (contactForm) {
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const name = document.getElementById('form-name').value.trim();
@@ -215,23 +188,35 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const subject = encodeURIComponent(`New Project Inquiry: ${project}`);
-            const body = encodeURIComponent(`Name: ${name}
-
-Email: ${email}
-
-Project Type: ${project}
-
-Message:
-${message}`);
+            const body = encodeURIComponent(`Name: ${name}\n\nEmail: ${email}\n\nProject Type: ${project}\n\nMessage:\n${message}`);
             window.location.href = `mailto:bitupanborah1k@gmail.com?subject=${subject}&body=${body}`;
 
             if (formSuccess) {
-                formSuccess.classList.remove('hidden');
+                formSuccess.classList.add('visible');
                 contactForm.reset();
-                setTimeout(() => formSuccess.classList.add('hidden'), 5000);
+                setTimeout(() => formSuccess.classList.remove('visible'), 5000);
             }
         });
     }
 
-    console.log('Initialization complete.');
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Ecosystem content transition
+    if (ecosystemContent) {
+        ecosystemContent.style.transition = 'opacity 0.3s';
+    }
+
+    // Quote transition
+    if (quoteEl) {
+        quoteEl.style.transition = 'opacity 0.3s';
+    }
 });
