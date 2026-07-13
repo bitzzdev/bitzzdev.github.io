@@ -1,109 +1,124 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Mobile Menu
+    // ═══════════════════════════════════════════════════════════
+    // CUSTOM CURSOR
+    // ═══════════════════════════════════════════════════════════
+    const cursor = document.getElementById('cursor');
+    const cursorBubble = document.getElementById('cursor-bubble');
+    let mouseX = 0, mouseY = 0;
+    let cursorX = 0, cursorY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    const animateCursor = () => {
+        cursorX += (mouseX - cursorX) * 0.15;
+        cursorY += (mouseY - cursorY) * 0.15;
+        if (cursor) {
+            cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+        }
+        requestAnimationFrame(animateCursor);
+    };
+    animateCursor();
+
+    // Cursor hover effects
+    const cursorElements = document.querySelectorAll('[data-cursor]');
+    cursorElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            const text = el.getAttribute('data-cursor');
+            if (cursorBubble && text) {
+                cursorBubble.textContent = text;
+            }
+            cursor?.classList.add('active');
+
+            // Check if element is near right edge
+            const rect = el.getBoundingClientRect();
+            if (rect.right > window.innerWidth - 100) {
+                cursor?.classList.add('active-edge');
+            }
+        });
+
+        el.addEventListener('mouseleave', () => {
+            cursor?.classList.remove('active', 'active-edge');
+        });
+    });
+
+    // ═══════════════════════════════════════════════════════════
+    // MOBILE MENU
+    // ═══════════════════════════════════════════════════════════
     const menuToggle = document.getElementById('menu-toggle');
     const menuClose = document.getElementById('menu-close');
     const mobileMenu = document.getElementById('mobile-menu');
 
-    if (menuToggle && mobileMenu) {
-        menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        });
-    }
+    menuToggle?.addEventListener('click', () => {
+        mobileMenu?.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    });
 
-    if (menuClose && mobileMenu) {
-        menuClose.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
-            document.body.style.overflow = '';
-        });
-    }
+    menuClose?.addEventListener('click', () => {
+        mobileMenu?.classList.remove('open');
+        document.body.style.overflow = '';
+    });
 
-    // Close mobile menu on link click
     mobileMenu?.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
+            mobileMenu?.classList.remove('open');
             document.body.style.overflow = '';
         });
     });
 
-    // Scroll Reveal
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
+    // ═══════════════════════════════════════════════════════════
+    // ABOUT MODAL
+    // ═══════════════════════════════════════════════════════════
+    const aboutModal = document.getElementById('about-modal');
+    const openAboutBtns = document.querySelectorAll('[data-open-about]');
+    const closeAboutBtns = document.querySelectorAll('[data-close-about]');
+
+    openAboutBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            aboutModal?.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    closeAboutBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            aboutModal?.classList.remove('open');
+            document.body.style.overflow = '';
+        });
+    });
+
+    // Close on escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            aboutModal?.classList.remove('open');
+            mobileMenu?.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════════
+    // SCROLL REVEAL ANIMATIONS
+    // ═══════════════════════════════════════════════════════════
+    const revealElements = document.querySelectorAll('.reveal, .split-reveal');
+
+    const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
             }
         });
-    }, { threshold: 0.1 });
-
-    reveals.forEach(el => observer.observe(el));
-
-    // Ecosystem Tabs
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const ecosystemContent = document.getElementById('ecosystem-content');
-
-    const frontendContent = `
-        <span class="ecosystem-tag">React / JS</span>
-        <h3 class="ecosystem-heading">Intuitive, Blazing Fast Interfaces</h3>
-        <p class="ecosystem-text">The visual tier is optimized for high conversion. We employ lightweight components, custom Tailwind themes, and modular components that load instantly. Perfect Core Web Vitals is our standard.</p>
-        <div class="tech-grid">
-            <div class="tech-item">
-                <div class="tech-name">JS / TS</div>
-                <div class="tech-desc">Robust Logic</div>
-            </div>
-            <div class="tech-item">
-                <div class="tech-name">Tailwind</div>
-                <div class="tech-desc">Responsive Utility</div>
-            </div>
-            <div class="tech-item">
-                <div class="tech-name">Vite / ESB</div>
-                <div class="tech-desc">Blazing Bundles</div>
-            </div>
-            <div class="tech-item">
-                <div class="tech-name">A11y / SEO</div>
-                <div class="tech-desc">Max Accessibility</div>
-            </div>
-        </div>
-    `;
-
-    const devopsContent = `
-        <span class="ecosystem-tag">CI/CD / Cloud</span>
-        <h3 class="ecosystem-heading">Architecting for Scale & Reliability</h3>
-        <p class="ecosystem-text">I don't just code; I orchestrate. From automated deployment pipelines to edge-computing strategies, I ensure your product remains stable under heavy load and deploys in seconds.</p>
-        <div class="tech-grid">
-            <div class="tech-item">
-                <div class="tech-name">Docker</div>
-                <div class="tech-desc">Containerized</div>
-            </div>
-            <div class="tech-item">
-                <div class="tech-name">GitHub Act</div>
-                <div class="tech-desc">Auto-Deployed</div>
-            </div>
-            <div class="tech-item">
-                <div class="tech-name">Vercel/AWS</div>
-                <div class="tech-desc">Edge Delivery</div>
-            </div>
-            <div class="tech-item">
-                <div class="tech-name">Terraform</div>
-                <div class="tech-desc">Infra-as-Code</div>
-            </div>
-        </div>
-    `;
-
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            tabBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            ecosystemContent.style.opacity = '0';
-            setTimeout(() => {
-                ecosystemContent.innerHTML = btn.dataset.tab === 'frontend' ? frontendContent : devopsContent;
-                ecosystemContent.style.opacity = '1';
-            }, 300);
-        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
     });
 
-    // Testimonials Slider
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // ═══════════════════════════════════════════════════════════
+    // TESTIMONIALS SLIDER
+    // ═══════════════════════════════════════════════════════════
     const testimonials = [
         {
             quote: "Bitupan's work was exceptional. He rewritten our entire web interface using custom-tailored elements. Our loading speeds went from 4.2 seconds to under 0.8 seconds, and organic checkouts spiked by 35% within the first month itself.",
@@ -133,7 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateSlider = () => {
         const t = testimonials[currentTestimonial];
+        if (!quoteEl) return;
+
         quoteEl.style.opacity = '0';
+        quoteEl.style.transform = 'translateY(10px)';
+
         setTimeout(() => {
             quoteEl.innerHTML = `
                 <p class="testimonial-quote">"${t.quote}"</p>
@@ -146,77 +165,136 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             quoteEl.style.opacity = '1';
+            quoteEl.style.transform = 'translateY(0)';
         }, 300);
+
         dots.forEach((dot, idx) => {
             dot.classList.toggle('active', idx === currentTestimonial);
         });
     };
 
-    if (prevBtn && nextBtn) {
-        prevBtn.addEventListener('click', () => {
-            currentTestimonial = (currentTestimonial - 1 + testimonials.length) % testimonials.length;
-            updateSlider();
-        });
-        nextBtn.addEventListener('click', () => {
-            currentTestimonial = (currentTestimonial + 1) % testimonials.length;
-            updateSlider();
-        });
-    }
+    prevBtn?.addEventListener('click', () => {
+        currentTestimonial = (currentTestimonial - 1 + testimonials.length) % testimonials.length;
+        updateSlider();
+    });
+
+    nextBtn?.addEventListener('click', () => {
+        currentTestimonial = (currentTestimonial + 1) % testimonials.length;
+        updateSlider();
+    });
 
     dots.forEach(dot => {
         dot.addEventListener('click', () => {
-            currentTestimonial = parseInt(dot.dataset.index);
+            currentTestimonial = parseInt(dot.getAttribute('data-index'));
             updateSlider();
         });
     });
 
-    // Contact Form
+    // Add transition styles
+    if (quoteEl) {
+        quoteEl.style.transition = 'opacity 0.3s, transform 0.3s';
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // CONTACT FORM
+    // ═══════════════════════════════════════════════════════════
     const contactForm = document.getElementById('contact-form');
     const formSuccess = document.getElementById('form-success');
 
-    if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('form-name').value.trim();
-            const email = document.getElementById('form-email').value.trim();
-            const project = document.getElementById('form-project').value;
-            const message = document.getElementById('form-message').value.trim();
+    contactForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('form-name')?.value.trim();
+        const email = document.getElementById('form-email')?.value.trim();
+        const project = document.getElementById('form-project')?.value;
+        const message = document.getElementById('form-message')?.value.trim();
 
-            if (!name || !email || !message) {
-                alert('Please fill out all mandatory fields.');
-                return;
-            }
+        if (!name || !email || !message) {
+            alert('Please fill out all mandatory fields.');
+            return;
+        }
 
-            const subject = encodeURIComponent(`New Project Inquiry: ${project}`);
-            const body = encodeURIComponent(`Name: ${name}\n\nEmail: ${email}\n\nProject Type: ${project}\n\nMessage:\n${message}`);
-            window.location.href = `mailto:bitupanborah1k@gmail.com?subject=${subject}&body=${body}`;
+        const subject = encodeURIComponent(`New Project Inquiry: ${project}`);
+        const body = encodeURIComponent(`Name: ${name}\n\nEmail: ${email}\n\nProject Type: ${project}\n\nMessage:\n${message}`);
+        window.location.href = `mailto:bitupanborah1k@gmail.com?subject=${subject}&body=${body}`;
 
-            if (formSuccess) {
-                formSuccess.classList.add('visible');
-                contactForm.reset();
-                setTimeout(() => formSuccess.classList.remove('visible'), 5000);
-            }
-        });
-    }
+        if (formSuccess) {
+            formSuccess.classList.add('visible');
+            contactForm.reset();
+            setTimeout(() => formSuccess.classList.remove('visible'), 5000);
+        }
+    });
 
-    // Smooth scroll for anchor links
+    // ═══════════════════════════════════════════════════════════
+    // SMOOTH SCROLL
+    // ═══════════════════════════════════════════════════════════
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
             }
         });
     });
 
-    // Ecosystem content transition
-    if (ecosystemContent) {
-        ecosystemContent.style.transition = 'opacity 0.3s';
-    }
+    // ═══════════════════════════════════════════════════════════
+    // NAV SCROLL EFFECT
+    // ═══════════════════════════════════════════════════════════
+    const nav = document.querySelector('.nav');
+    let lastScroll = 0;
 
-    // Quote transition
-    if (quoteEl) {
-        quoteEl.style.transition = 'opacity 0.3s';
-    }
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.scrollY;
+
+        if (currentScroll > 100) {
+            nav?.classList.add('scrolled');
+        } else {
+            nav?.classList.remove('scrolled');
+        }
+
+        lastScroll = currentScroll;
+    }, { passive: true });
+
+    // ═══════════════════════════════════════════════════════════
+    // PARALLAX EFFECT ON HERO
+    // ═══════════════════════════════════════════════════════════
+    const heroTitle = document.querySelector('.hero-title');
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+
+    window.addEventListener('scroll', () => {
+        const scrolled = window.scrollY;
+        if (heroTitle && scrolled < window.innerHeight) {
+            heroTitle.style.transform = `translateY(${scrolled * 0.3}px)`;
+            heroTitle.style.opacity = 1 - (scrolled / window.innerHeight);
+        }
+        if (heroSubtitle && scrolled < window.innerHeight) {
+            heroSubtitle.style.transform = `translateY(${scrolled * 0.2}px)`;
+            heroSubtitle.style.opacity = 1 - (scrolled / window.innerHeight);
+        }
+    }, { passive: true });
+
+    // ═══════════════════════════════════════════════════════════
+    // STAGGER ANIMATION FOR GRID ITEMS
+    // ═══════════════════════════════════════════════════════════
+    const staggerItems = document.querySelectorAll('.work-item, .process-item, .metric-item');
+
+    const staggerObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, index * 100);
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    staggerItems.forEach(item => {
+        item.classList.add('reveal');
+        staggerObserver.observe(item);
+    });
 });

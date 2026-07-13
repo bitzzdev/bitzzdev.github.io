@@ -7,8 +7,11 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        /* ═══════════════════════════════════════════════════════════
+           RESET & VARIABLES
+           ═══════════════════════════════════════════════════════════ */
         *, *::before, *::after {
             margin: 0;
             padding: 0;
@@ -17,14 +20,19 @@
 
         :root {
             --bg: #080807;
+            --bg-card: #0d0d0c;
             --text: #f3f2ef;
-            --text-muted: rgba(243, 242, 239, 0.5);
+            --text-muted: rgba(243, 242, 239, 0.45);
+            --text-dim: rgba(243, 242, 239, 0.25);
             --accent: #c5a56f;
             --accent-light: #e3c793;
             --border: rgba(243, 242, 239, 0.08);
-            --serif: 'DM Serif Display', Georgia, serif;
-            --sans: 'Inter', -apple-system, sans-serif;
-            --mono: 'JetBrains Mono', monospace;
+            --border-hover: rgba(243, 242, 239, 0.15);
+            --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+            --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --mono: 'JetBrains Mono', 'SF Mono', monospace;
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-expo: cubic-bezier(0.2, 1, 0.36, 1);
         }
 
         html {
@@ -33,12 +41,12 @@
             font-family: var(--sans);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            scroll-behavior: smooth;
         }
 
         body {
             background: var(--bg);
             overflow-x: hidden;
+            cursor: none;
         }
 
         ::selection {
@@ -51,20 +59,40 @@
             text-decoration: none;
         }
 
-        img {
+        button {
+            background: none;
+            border: none;
+            color: inherit;
+            font: inherit;
+            cursor: none;
+        }
+
+        img, video {
             max-width: 100%;
             display: block;
         }
 
-        /* Grain Overlay */
+        ul, ol {
+            list-style: none;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           GRAIN OVERLAY
+           ═══════════════════════════════════════════════════════════ */
         .grain {
             position: fixed;
             inset: 0;
             z-index: 9999;
             pointer-events: none;
-            opacity: 0.035;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            background-repeat: repeat;
+            opacity: 0.04;
+            will-change: transform;
+        }
+
+        .grain::before {
+            content: '';
+            position: absolute;
+            inset: -200%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
             background-size: 256px 256px;
             animation: grain 0.5s steps(6) infinite;
         }
@@ -78,14 +106,78 @@
             83% { transform: translate(-1%, 7%); }
         }
 
-        /* Navigation */
+        /* ═══════════════════════════════════════════════════════════
+           CUSTOM CURSOR
+           ═══════════════════════════════════════════════════════════ */
+        .cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10000;
+            pointer-events: none;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.15s var(--ease-out);
+        }
+
+        .cursor-bubble {
+            position: absolute;
+            top: -16px;
+            left: 16px;
+            padding: 8px 16px;
+            background: var(--text);
+            color: var(--bg);
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: all 0.45s var(--ease-out);
+            clip-path: inset(0 100% 0 0 round 6px);
+        }
+
+        .cursor.active .cursor-bubble {
+            opacity: 1;
+            transform: translateY(0);
+            clip-path: inset(0 0 0 0 round 6px);
+        }
+
+        .cursor.active-edge .cursor-bubble {
+            opacity: 1;
+            transform: translateY(0);
+            clip-path: inset(0 0 0 0 round 6px);
+            left: auto;
+            right: 16px;
+        }
+
+        .cursor.hovering {
+            transform: scale(1.5);
+        }
+
+        @media (hover: none) {
+            .cursor { display: none; }
+            body { cursor: auto; }
+            button { cursor: pointer; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           NAVIGATION
+           ═══════════════════════════════════════════════════════════ */
         .nav {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 100;
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -96,45 +188,84 @@
             font-family: var(--serif);
             font-size: 1.5rem;
             letter-spacing: -0.02em;
+            cursor: none;
         }
 
         .nav-links {
             display: flex;
-            gap: 2.5rem;
-            list-style: none;
+            gap: 2rem;
+            align-items: center;
         }
 
-        .nav-links a {
-            font-size: 0.875rem;
+        .nav-link {
+            position: relative;
+            font-size: 0.85rem;
             font-weight: 400;
-            letter-spacing: 0.02em;
-            transition: opacity 0.3s;
+            letter-spacing: 0.01em;
+            padding: 0.25rem 0;
+            overflow: hidden;
+            cursor: none;
         }
 
-        .nav-links a:hover {
-            opacity: 0.6;
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--text);
+            transform-origin: right;
+            transform: scaleX(0);
+            transition: transform 900ms var(--ease-expo);
+        }
+
+        .nav-link:hover::before {
+            transform-origin: left;
+            transform: scaleX(1);
+        }
+
+        .nav-link span {
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover span {
+            color: var(--bg);
         }
 
         .nav-cta {
-            font-size: 0.875rem;
-            padding: 0.6rem 1.5rem;
-            border: 1px solid rgba(243, 242, 239, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.25rem;
+            border: 1px solid rgba(243, 242, 239, 0.25);
             border-radius: 100px;
-            transition: all 0.3s;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.4s var(--ease-out);
+            cursor: none;
         }
 
         .nav-cta:hover {
             background: var(--text);
             color: var(--bg);
+            border-color: var(--text);
+        }
+
+        .nav-cta svg {
+            transition: transform 0.4s var(--ease-out);
+        }
+
+        .nav-cta:hover svg {
+            transform: translate(3px, -3px);
         }
 
         .nav-menu-btn {
             display: none;
-            background: none;
-            border: none;
-            color: var(--text);
-            cursor: pointer;
             padding: 0.5rem;
+            cursor: none;
         }
 
         .nav-menu-btn svg {
@@ -142,208 +273,146 @@
             height: 24px;
         }
 
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
+        /* ═══════════════════════════════════════════════════════════
+           MOBILE MENU
+           ═══════════════════════════════════════════════════════════ */
+        .mobile-menu {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--bg);
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            padding: 8rem 2rem 4rem;
-            position: relative;
-        }
-
-        .hero-eyebrow {
-            font-family: var(--mono);
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 2rem;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeUp 0.8s 0.2s forwards;
-        }
-
-        .hero-title {
-            font-family: var(--serif);
-            font-size: clamp(3rem, 8vw, 7rem);
-            line-height: 1.05;
-            letter-spacing: -0.03em;
-            max-width: 900px;
-            opacity: 0;
-            transform: translateY(40px);
-            animation: fadeUp 1s 0.4s forwards;
-        }
-
-        .hero-title em {
-            font-style: italic;
-            color: var(--accent);
-        }
-
-        .hero-sub {
-            font-size: 1.125rem;
-            line-height: 1.7;
-            color: var(--text-muted);
-            max-width: 500px;
-            margin-top: 2.5rem;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeUp 0.8s 0.6s forwards;
-        }
-
-        .hero-cta-row {
-            display: flex;
-            gap: 1rem;
-            margin-top: 3rem;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeUp 0.8s 0.8s forwards;
-        }
-
-        .btn-primary {
-            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 1rem 2rem;
+            justify-content: center;
+            gap: 1.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s var(--ease-out);
+        }
+
+        .mobile-menu.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 1.25rem;
+            right: 2rem;
+            padding: 0.5rem;
+            cursor: none;
+        }
+
+        .mobile-menu-close svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .mobile-menu a {
+            font-family: var(--serif);
+            font-size: 2.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s var(--ease-out);
+        }
+
+        .mobile-menu.open a {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mobile-menu.open a:nth-child(2) { transition-delay: 0.1s; }
+        .mobile-menu.open a:nth-child(3) { transition-delay: 0.15s; }
+        .mobile-menu.open a:nth-child(4) { transition-delay: 0.2s; }
+        .mobile-menu.open a:nth-child(5) { transition-delay: 0.25s; }
+        .mobile-menu.open a:nth-child(6) { transition-delay: 0.3s; }
+
+        .mobile-menu a:hover {
+            color: var(--accent);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           ABOUT MODAL
+           ═══════════════════════════════════════════════════════════ */
+        .about-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: var(--bg);
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s var(--ease-out);
+        }
+
+        .about-modal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .about-modal-close {
+            position: fixed;
+            top: 1.25rem;
+            right: 2rem;
+            z-index: 301;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 1.25rem;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .about-modal-close:hover {
             background: var(--text);
             color: var(--bg);
-            font-family: var(--sans);
-            font-size: 0.875rem;
-            font-weight: 500;
-            border-radius: 100px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .btn-primary:hover {
-            transform: scale(0.97);
-            opacity: 0.9;
+        .about-modal-close .esc {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            opacity: 0.5;
         }
 
-        .btn-secondary {
-            display: inline-flex;
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .about-eyebrow {
+            display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 1rem 2rem;
-            background: transparent;
-            color: var(--text);
-            font-family: var(--sans);
-            font-size: 0.875rem;
-            font-weight: 500;
-            border-radius: 100px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .btn-secondary:hover {
-            border-color: rgba(243, 242, 239, 0.3);
-            background: rgba(243, 242, 239, 0.05);
-        }
-
-        .hero-scroll {
-            position: absolute;
-            bottom: 3rem;
-            left: 2rem;
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            writing-mode: vertical-rl;
-            opacity: 0;
-            animation: fadeUp 0.8s 1s forwards;
-        }
-
-        @keyframes fadeUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Section Styles */
-        section {
-            padding: 8rem 2rem;
-            position: relative;
-        }
-
-        .section-label {
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 2rem;
-        }
-
-        .section-title {
-            font-family: var(--serif);
-            font-size: clamp(2rem, 5vw, 4rem);
-            line-height: 1.1;
-            letter-spacing: -0.02em;
-            max-width: 800px;
-        }
-
-        .section-text {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: var(--text-muted);
-            max-width: 500px;
-            margin-top: 1.5rem;
-        }
-
-        /* Metrics Section */
-        .metrics {
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2rem;
-        }
-
-        .metric-item {
-            padding: 2rem 0;
-        }
-
-        .metric-number {
-            font-family: var(--serif);
-            font-size: clamp(2.5rem, 4vw, 4rem);
-            line-height: 1;
-            letter-spacing: -0.02em;
-        }
-
-        .metric-label {
+            gap: 0.75rem;
             font-family: var(--mono);
             font-size: 0.7rem;
             letter-spacing: 0.1em;
             text-transform: uppercase;
             color: var(--accent);
-            margin-top: 0.75rem;
+            margin-bottom: 3rem;
         }
 
-        .metric-desc {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
+        .about-eyebrow-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .about-heading {
+            font-family: var(--serif);
+            font-size: clamp(1.5rem, 3vw, 2rem);
             line-height: 1.6;
-        }
-
-        /* About Section */
-        .about {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
+            font-weight: 400;
+            max-width: 700px;
         }
 
         .about-image {
-            aspect-ratio: 4/5;
-            background: linear-gradient(135deg, rgba(197, 165, 111, 0.1), rgba(197, 165, 111, 0.02));
+            margin-top: 4rem;
+            aspect-ratio: 16/9;
             border-radius: 1rem;
             overflow: hidden;
             position: relative;
@@ -355,18 +424,357 @@
             object-fit: cover;
         }
 
-        .about-content {
-            max-width: 500px;
+        .about-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(8, 8, 7, 0.6), transparent);
         }
 
-        .about-text {
-            font-size: 1.125rem;
-            line-height: 1.8;
+        .about-image-text {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            right: 2rem;
+        }
+
+        .about-image-word {
+            font-family: var(--serif);
+            font-size: 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .about-image-word.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s var(--ease-out);
+        }
+
+        .about-section {
+            margin-top: 5rem;
+        }
+
+        .about-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: var(--serif);
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .about-section-title .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .about-clients-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+        }
+
+        .about-client-item {
+            padding: 1.5rem;
+            background: var(--bg);
+            font-family: var(--serif);
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        .about-client-item:hover {
+            color: var(--accent);
+        }
+
+        .about-values-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .about-value-item {
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .about-value-title {
+            font-family: var(--serif);
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .about-value-desc {
+            font-size: 0.875rem;
             color: var(--text-muted);
-            margin-top: 2rem;
+            line-height: 1.7;
         }
 
-        /* Services Section */
+        /* ═══════════════════════════════════════════════════════════
+           HERO SECTION
+           ═══════════════════════════════════════════════════════════ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero-title {
+            font-family: var(--serif);
+            font-size: clamp(3.5rem, 9vw, 8rem);
+            line-height: 1;
+            letter-spacing: -0.03em;
+            font-weight: 400;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .hero-subtitle {
+            margin-top: 2rem;
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 450px;
+            line-height: 1.7;
+        }
+
+        .hero-bottom {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            right: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .hero-scroll {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: var(--text);
+            color: var(--bg);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 100px;
+            transition: all 0.4s var(--ease-out);
+            cursor: none;
+        }
+
+        .hero-cta:hover {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+
+        .hero-cta svg {
+            transition: transform 0.4s var(--ease-out);
+        }
+
+        .hero-cta:hover svg {
+            transform: translate(4px, -4px);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           WORK SECTION
+           ═══════════════════════════════════════════════════════════ */
+        .work {
+            padding: 8rem 2rem;
+        }
+
+        .work-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 4rem;
+        }
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-label-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .section-title {
+            font-family: var(--serif);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            line-height: 1.1;
+            font-weight: 400;
+        }
+
+        .work-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .work-item {
+            position: relative;
+            aspect-ratio: 4/3;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: var(--bg-card);
+            cursor: none;
+        }
+
+        .work-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s var(--ease-out);
+        }
+
+        .work-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .work-item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(8, 8, 7, 0.8), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .work-item:hover .work-item-overlay {
+            opacity: 1;
+        }
+
+        .work-item-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.4s var(--ease-out);
+        }
+
+        .work-item:hover .work-item-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .work-item-title {
+            font-family: var(--serif);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .work-item-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .work-item-arrow {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--text);
+            color: var(--bg);
+            border-radius: 50%;
+            opacity: 0;
+            transform: translate(-10px, 10px);
+            transition: all 0.4s var(--ease-out);
+        }
+
+        .work-item:hover .work-item-arrow {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           PROCESS SECTION
+           ═══════════════════════════════════════════════════════════ */
+        .process {
+            padding: 8rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            margin-top: 4rem;
+        }
+
+        .process-item {
+            padding: 3rem 2rem;
+            background: var(--bg);
+            transition: background 0.4s;
+        }
+
+        .process-item:hover {
+            background: var(--bg-card);
+        }
+
+        .process-number {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .process-title {
+            font-family: var(--serif);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .process-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           SERVICES SECTION
+           ═══════════════════════════════════════════════════════════ */
+        .services {
+            padding: 8rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
         .services-list {
             margin-top: 4rem;
         }
@@ -376,25 +784,29 @@
             grid-template-columns: 1fr 2fr 1fr;
             gap: 2rem;
             align-items: center;
-            padding: 3rem 0;
+            padding: 2.5rem 0;
             border-top: 1px solid var(--border);
             transition: all 0.4s;
+            cursor: none;
         }
 
         .service-item:last-child {
             border-bottom: 1px solid var(--border);
         }
 
+        .service-item:hover {
+            padding-left: 1rem;
+        }
+
         .service-number {
             font-family: var(--mono);
-            font-size: 0.75rem;
-            color: var(--text-muted);
+            font-size: 0.7rem;
+            color: var(--text-dim);
         }
 
         .service-title {
             font-family: var(--serif);
-            font-size: clamp(1.5rem, 3vw, 2.5rem);
-            letter-spacing: -0.02em;
+            font-size: clamp(1.25rem, 2.5vw, 2rem);
             transition: color 0.3s;
         }
 
@@ -403,149 +815,27 @@
         }
 
         .service-desc {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             line-height: 1.7;
             text-align: right;
         }
 
-        /* Ecosystem Section */
-        .ecosystem {
-            background: rgba(243, 242, 239, 0.02);
-            border-radius: 2rem;
-            margin: 0 2rem;
+        /* ═══════════════════════════════════════════════════════════
+           TESTIMONIALS SECTION
+           ═══════════════════════════════════════════════════════════ */
+        .testimonials {
+            padding: 8rem 2rem;
+            border-top: 1px solid var(--border);
         }
 
-        .ecosystem-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            margin-top: 4rem;
-        }
-
-        .ecosystem-content {
-            padding: 2rem;
-            background: var(--bg);
-            border-radius: 1rem;
-            border: 1px solid var(--border);
-        }
-
-        .ecosystem-tag {
-            display: inline-block;
-            font-family: var(--mono);
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            padding: 0.4rem 0.8rem;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            border-radius: 100px;
-            margin-bottom: 1.5rem;
-        }
-
-        .ecosystem-heading {
-            font-family: var(--serif);
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .ecosystem-text {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            line-height: 1.7;
-            margin-bottom: 2rem;
-        }
-
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-        }
-
-        .tech-item {
-            padding: 1rem;
-            background: rgba(243, 242, 239, 0.03);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .tech-item:hover {
-            border-color: rgba(197, 165, 111, 0.3);
-        }
-
-        .tech-name {
-            font-family: var(--mono);
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--accent);
-        }
-
-        .tech-desc {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
-
-        /* Tab Controls */
-        .tab-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .tab-btn {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1.25rem 1.5rem;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            color: var(--text-muted);
-            font-family: var(--sans);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .tab-btn:hover {
-            border-color: rgba(243, 242, 239, 0.2);
-            color: var(--text);
-        }
-
-        .tab-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: var(--bg);
-        }
-
-        .tab-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: currentColor;
-            opacity: 0.3;
-        }
-
-        .tab-btn.active .tab-dot {
-            opacity: 1;
-        }
-
-        /* Testimonials */
         .testimonials-wrapper {
             margin-top: 4rem;
             max-width: 800px;
         }
 
         .testimonial-card {
-            padding: 3rem;
-            background: rgba(243, 242, 239, 0.02);
-            border: 1px solid var(--border);
-            border-radius: 1.5rem;
-            min-height: 300px;
+            min-height: 280px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -553,8 +843,8 @@
 
         .testimonial-quote {
             font-family: var(--serif);
-            font-size: clamp(1.25rem, 2vw, 1.75rem);
-            line-height: 1.5;
+            font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+            line-height: 1.6;
             font-style: italic;
         }
 
@@ -594,8 +884,10 @@
         .testimonial-nav {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
-            margin-top: 2rem;
+            gap: 1rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
         }
 
         .testimonial-dots {
@@ -607,14 +899,12 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: var(--text-muted);
-            opacity: 0.3;
-            cursor: pointer;
+            background: var(--text-dim);
+            cursor: none;
             transition: all 0.3s;
         }
 
         .testimonial-dot.active {
-            opacity: 1;
             background: var(--text);
         }
 
@@ -629,13 +919,11 @@
             height: 40px;
             border-radius: 50%;
             border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text);
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s;
+            cursor: none;
         }
 
         .testimonial-btn:hover {
@@ -648,8 +936,62 @@
             height: 16px;
         }
 
-        /* Contact Section */
+        /* ═══════════════════════════════════════════════════════════
+           METRICS SECTION
+           ═══════════════════════════════════════════════════════════ */
+        .metrics {
+            padding: 8rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+        }
+
+        .metric-item {
+            padding: 3rem 2rem;
+            background: var(--bg);
+            transition: background 0.4s;
+        }
+
+        .metric-item:hover {
+            background: var(--bg-card);
+        }
+
+        .metric-number {
+            font-family: var(--serif);
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-top: 1rem;
+        }
+
+        .metric-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.75rem;
+            line-height: 1.6;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           CONTACT SECTION
+           ═══════════════════════════════════════════════════════════ */
         .contact {
+            padding: 8rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .contact-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 6rem;
@@ -657,6 +999,13 @@
 
         .contact-info {
             max-width: 400px;
+        }
+
+        .contact-text {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-top: 1.5rem;
         }
 
         .contact-details {
@@ -691,14 +1040,14 @@
 
         .contact-label {
             font-family: var(--mono);
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: var(--text-dim);
         }
 
         .contact-value {
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             margin-top: 0.25rem;
         }
 
@@ -713,9 +1062,9 @@
         /* Form */
         .contact-form {
             padding: 3rem;
-            background: rgba(243, 242, 239, 0.02);
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 1.5rem;
+            border-radius: 1rem;
         }
 
         .form-group {
@@ -725,10 +1074,10 @@
         .form-label {
             display: block;
             font-family: var(--mono);
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: var(--text-dim);
             margin-bottom: 0.75rem;
         }
 
@@ -739,11 +1088,12 @@
             padding: 1rem 1.25rem;
             background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 0.75rem;
+            border-radius: 0.5rem;
             color: var(--text);
             font-family: var(--sans);
             font-size: 0.875rem;
             transition: border-color 0.3s;
+            cursor: none;
         }
 
         .form-input:focus,
@@ -755,13 +1105,11 @@
 
         .form-input::placeholder,
         .form-textarea::placeholder {
-            color: var(--text-muted);
-            opacity: 0.5;
+            color: var(--text-dim);
         }
 
         .form-select {
             appearance: none;
-            cursor: pointer;
         }
 
         .form-textarea {
@@ -775,12 +1123,12 @@
             background: var(--text);
             color: var(--bg);
             border: none;
-            border-radius: 0.75rem;
+            border-radius: 0.5rem;
             font-family: var(--sans);
             font-size: 0.875rem;
             font-weight: 500;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.4s var(--ease-out);
+            cursor: none;
         }
 
         .form-submit:hover {
@@ -793,7 +1141,7 @@
             padding: 1rem;
             background: rgba(197, 165, 111, 0.1);
             border: 1px solid var(--accent);
-            border-radius: 0.75rem;
+            border-radius: 0.5rem;
             color: var(--accent);
             font-size: 0.875rem;
             text-align: center;
@@ -804,7 +1152,9 @@
             display: block;
         }
 
-        /* Footer */
+        /* ═══════════════════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════════════════ */
         .footer {
             padding: 4rem 2rem 2rem;
             border-top: 1px solid var(--border);
@@ -825,7 +1175,6 @@
         .footer-logo {
             font-family: var(--serif);
             font-size: 1.5rem;
-            letter-spacing: -0.02em;
         }
 
         .footer-desc {
@@ -864,7 +1213,7 @@
 
         .footer-heading {
             font-family: var(--mono);
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             letter-spacing: 0.15em;
             text-transform: uppercase;
             color: var(--accent);
@@ -872,7 +1221,6 @@
         }
 
         .footer-links {
-            list-style: none;
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
@@ -894,7 +1242,7 @@
             justify-content: space-between;
             padding-top: 2rem;
             font-size: 0.7rem;
-            color: var(--text-muted);
+            color: var(--text-dim);
         }
 
         .footer-bottom-links {
@@ -910,11 +1258,13 @@
             color: var(--text);
         }
 
-        /* Scroll Reveal */
+        /* ═══════════════════════════════════════════════════════════
+           SCROLL ANIMATIONS
+           ═══════════════════════════════════════════════════════════ */
         .reveal {
             opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(40px);
+            transition: all 0.8s var(--ease-out);
         }
 
         .reveal.visible {
@@ -922,76 +1272,51 @@
             transform: translateY(0);
         }
 
-        /* Mobile Menu */
-        .mobile-menu {
-            position: fixed;
-            inset: 0;
-            z-index: 200;
-            background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2rem;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s;
+        .split-reveal {
+            overflow: hidden;
         }
 
-        .mobile-menu.open {
-            opacity: 1;
-            visibility: visible;
+        .split-reveal-inner {
+            transform: translateY(100%);
+            transition: transform 0.8s var(--ease-out);
         }
 
-        .mobile-menu a {
-            font-family: var(--serif);
-            font-size: 2rem;
-            transition: color 0.3s;
+        .split-reveal.visible .split-reveal-inner {
+            transform: translateY(0);
         }
 
-        .mobile-menu a:hover {
-            color: var(--accent);
-        }
-
-        .mobile-menu-close {
-            position: absolute;
-            top: 1.5rem;
-            right: 2rem;
-            background: none;
-            border: none;
-            color: var(--text);
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .mobile-menu-close svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        /* Responsive */
+        /* ═══════════════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════════════ */
         @media (max-width: 1024px) {
-            .about {
+            .work-grid {
                 grid-template-columns: 1fr;
-                gap: 3rem;
+            }
+
+            .process-grid {
+                grid-template-columns: 1fr;
             }
 
             .service-item {
                 grid-template-columns: 1fr;
-                gap: 1rem;
+                gap: 0.75rem;
             }
 
             .service-desc {
                 text-align: left;
             }
 
-            .ecosystem-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .contact {
+            .contact-grid {
                 grid-template-columns: 1fr;
                 gap: 4rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .about-clients-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .footer-grid {
@@ -1010,11 +1335,27 @@
             }
 
             .hero-title {
-                font-size: clamp(2.5rem, 10vw, 4rem);
+                font-size: clamp(2.5rem, 12vw, 4rem);
+            }
+
+            .hero-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .work-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
             }
 
             .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
+            }
+
+            .about-clients-grid {
+                grid-template-columns: 1fr;
             }
 
             .footer-grid {
@@ -1028,12 +1369,7 @@
                 text-align: center;
             }
 
-            .ecosystem {
-                margin: 0 1rem;
-                padding: 4rem 1.5rem;
-            }
-
-            section {
+            section, .work, .process, .services, .testimonials, .metrics, .contact {
                 padding: 5rem 1.5rem;
             }
         }
@@ -1043,18 +1379,36 @@
     <!-- Grain Overlay -->
     <div class="grain" aria-hidden="true"></div>
 
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor">
+        <div class="cursor-dot"></div>
+        <div class="cursor-bubble" id="cursor-bubble">View</div>
+    </div>
+
     <!-- Navigation -->
     <nav class="nav">
-        <a href="#home" class="nav-logo">bitz.dev</a>
-        <ul class="nav-links">
-            <li><a href="#about">About</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#ecosystem">Ecosystem</a></li>
-            <li><a href="#testimonials">Client Love</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-        <a href="#contact" class="nav-cta">Let's Talk</a>
-        <button class="nav-menu-btn" id="menu-toggle" aria-label="Toggle menu">
+        <a href="#home" class="nav-logo" data-cursor="bitz.dev">bitz.dev</a>
+        <div class="nav-links">
+            <button class="nav-link" data-open-about data-cursor="Read">
+                <span>About</span>
+            </button>
+            <a href="#work" class="nav-link" data-cursor="See">
+                <span>Work</span>
+            </a>
+            <a href="#process" class="nav-link" data-cursor="Explore">
+                <span>Process</span>
+            </a>
+            <a href="#services" class="nav-link" data-cursor="Discover">
+                <span>Services</span>
+            </a>
+            <a href="#contact" class="nav-cta">
+                <span>Contact</span>
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"></path>
+                </svg>
+            </a>
+        </div>
+        <button class="nav-menu-btn" id="menu-toggle" data-cursor="Menu">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
@@ -1063,38 +1417,272 @@
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobile-menu">
-        <button class="mobile-menu-close" id="menu-close" aria-label="Close menu">
+        <button class="mobile-menu-close" id="menu-close" data-cursor="Close">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
-        <a href="#about">About</a>
-        <a href="#services">Services</a>
-        <a href="#ecosystem">Ecosystem</a>
-        <a href="#testimonials">Client Love</a>
-        <a href="#contact">Contact</a>
+        <a href="#home" data-cursor="Home">Home</a>
+        <a href="#work" data-cursor="Work">Work</a>
+        <a href="#process" data-cursor="Process">Process</a>
+        <a href="#services" data-cursor="Services">Services</a>
+        <a href="#contact" data-cursor="Contact">Contact</a>
+    </div>
+
+    <!-- About Modal -->
+    <div class="about-modal" id="about-modal">
+        <button class="about-modal-close" data-close-about data-cursor="Close">
+            <span>Close</span>
+            <span class="esc">esc</span>
+        </button>
+        <div class="about-content">
+            <div class="about-eyebrow">
+                <div class="about-eyebrow-dot"></div>
+                <span>About the developer</span>
+            </div>
+            <p class="about-heading">Hey I'm Bitupan. I started bitz.dev because I watched businesses struggle with sluggish, over-engineered websites that never converted despite the quality of their products.<br><br>That gap became an obsession. I've spent years breaking down what separates forgettable digital presence from work that actually moves people, thinking that shapes every project we take on.<br><br>When we work together, I'm immersed in your story, ruthless about what moves people, and built to close the gap between who you are and how the world sees you.</p>
+            <div class="about-image">
+                <img src="favicon.png" alt="Bitupan Borah">
+                <div class="about-image-overlay"></div>
+                <div class="about-image-text">
+                    <div class="about-image-word visible">create</div>
+                </div>
+            </div>
+            <div class="about-section">
+                <h2 class="about-section-title">
+                    <span class="dot"></span>
+                    Clients
+                </h2>
+                <div class="about-clients-grid">
+                    <div class="about-client-item">SaaS Startups</div>
+                    <div class="about-client-item">E-commerce Brands</div>
+                    <div class="about-client-item">Creative Agencies</div>
+                    <div class="about-client-item">FinTech Companies</div>
+                    <div class="about-client-item">Tech Enterprises</div>
+                    <div class="about-client-item">Global Businesses</div>
+                </div>
+            </div>
+            <div class="about-section">
+                <h2 class="about-section-title">
+                    <span class="dot"></span>
+                    Awards
+                </h2>
+                <div class="about-clients-grid">
+                    <div class="about-client-item">100% Client Satisfaction</div>
+                    <div class="about-client-item">40+ Deployments</div>
+                    <div class="about-client-item">3x Speed Improvements</div>
+                    <div class="about-client-item">24/7 Support</div>
+                    <div class="about-client-item">Core Web Vitals Expert</div>
+                    <div class="about-client-item">SEO Specialist</div>
+                </div>
+            </div>
+            <div class="about-section">
+                <h2 class="about-section-title">
+                    <span class="dot"></span>
+                    Principles
+                </h2>
+                <div class="about-values-grid">
+                    <div class="about-value-item">
+                        <h3 class="about-value-title">Performance first, aesthetics second</h3>
+                        <p class="about-value-desc">Every creative decision we make is interrogated against one question: does this actually serve your growth?</p>
+                    </div>
+                    <div class="about-value-item">
+                        <h3 class="about-value-title">All in or nothing</h3>
+                        <p class="about-value-desc">We take on fewer projects so we can give each one everything. When we commit to your brand, we're fully present, fully invested, fully responsible for the result.</p>
+                    </div>
+                    <div class="about-value-item">
+                        <h3 class="about-value-title">Human-first, always</h3>
+                        <p class="about-value-desc">Behind every brand is a person with a real story and real stakes. We never lose sight of that. The most powerful digital experiences are the ones that feel unmistakably human.</p>
+                    </div>
+                    <div class="about-value-item">
+                        <h3 class="about-value-title">Intention over speed</h3>
+                        <p class="about-value-desc">Rushed work compounds into regret. We move at the pace the work demands. Every layer earns its place before we move to the next.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <span class="hero-eyebrow">Freelance Frontend Developer</span>
-        <h1 class="hero-title">A new way to build for the <em>Web</em> with precision.</h1>
-        <p class="hero-sub">I engineer highly-optimized, pixel-perfect freelance web solutions. Speed-obsessed development designed to scale businesses, connect services, and convert users.</p>
-        <div class="hero-cta-row">
-            <a href="#contact" class="btn-primary">
-                Start a Project
+        <div class="hero-content">
+            <h1 class="hero-title split-reveal">
+                <div class="split-reveal-inner">
+                    A new way to build for the <em>Web</em> with precision.
+                </div>
+            </h1>
+            <p class="hero-subtitle reveal">I engineer highly-optimized, pixel-perfect freelance web solutions. Speed-obsessed development designed to scale businesses, connect services, and convert users.</p>
+        </div>
+        <div class="hero-bottom">
+            <span class="hero-scroll reveal">Scroll to explore</span>
+            <a href="#contact" class="hero-cta reveal" data-cursor="Go">
+                <span>Start a Project</span>
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"></path>
                 </svg>
-            </a>
-            <a href="https://github.com/bitzzdev" target="_blank" class="btn-secondary">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-                GitHub
             </a>
         </div>
-        <span class="hero-scroll">Scroll to explore</span>
+    </section>
+
+    <!-- Work Section -->
+    <section class="work" id="work">
+        <div class="work-header">
+            <div>
+                <div class="section-label">
+                    <span class="section-label-dot"></span>
+                    <span>Work</span>
+                </div>
+                <h2 class="section-title">Selected projects</h2>
+            </div>
+        </div>
+        <div class="work-grid">
+            <div class="work-item reveal" data-cursor="View">
+                <img src="favicon.png" alt="Project 1" style="object-fit: cover; background: var(--bg-card);">
+                <div class="work-item-overlay"></div>
+                <div class="work-item-content">
+                    <h3 class="work-item-title">Custom Web Application</h3>
+                    <p class="work-item-desc">React, Node.js, Performance Optimization</p>
+                </div>
+                <div class="work-item-arrow">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="work-item reveal" data-cursor="View">
+                <img src="favicon.png" alt="Project 2" style="object-fit: cover; background: var(--bg-card);">
+                <div class="work-item-overlay"></div>
+                <div class="work-item-content">
+                    <h3 class="work-item-title">E-commerce Platform</h3>
+                    <p class="work-item-desc">UI/UX Design, Headless CMS, SEO</p>
+                </div>
+                <div class="work-item-arrow">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="work-item reveal" data-cursor="View">
+                <img src="favicon.png" alt="Project 3" style="object-fit: cover; background: var(--bg-card);">
+                <div class="work-item-overlay"></div>
+                <div class="work-item-content">
+                    <h3 class="work-item-title">SaaS Dashboard</h3>
+                    <p class="work-item-desc">TypeScript, Real-time Data, Analytics</p>
+                </div>
+                <div class="work-item-arrow">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="work-item reveal" data-cursor="View">
+                <img src="favicon.png" alt="Project 4" style="object-fit: cover; background: var(--bg-card);">
+                <div class="work-item-overlay"></div>
+                <div class="work-item-content">
+                    <h3 class="work-item-title">Corporate Website</h3>
+                    <p class="work-item-desc">Brand Identity, Webflow, Responsive Design</p>
+                </div>
+                <div class="work-item-arrow">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process" id="process">
+        <div class="section-label">
+            <span class="section-label-dot"></span>
+            <span>Process</span>
+        </div>
+        <h2 class="section-title reveal">How we build together</h2>
+        <div class="process-grid">
+            <div class="process-item reveal">
+                <div class="process-number">01</div>
+                <h3 class="process-title">Discovery</h3>
+                <p class="process-desc">We dive deep into your brand, audience, and goals to understand what makes you unique and how to position you for success.</p>
+            </div>
+            <div class="process-item reveal">
+                <div class="process-number">02</div>
+                <h3 class="process-title">Strategy</h3>
+                <p class="process-desc">We craft a clear roadmap that aligns your digital presence with your business objectives, ensuring every decision serves your growth.</p>
+            </div>
+            <div class="process-item reveal">
+                <div class="process-number">03</div>
+                <h3 class="process-title">Execution</h3>
+                <p class="process-desc">We build with precision, combining clean code with thoughtful design to create experiences that convert and impress.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="section-label">
+            <span class="section-label-dot"></span>
+            <span>Services</span>
+        </div>
+        <h2 class="section-title reveal">What we offer</h2>
+        <div class="services-list">
+            <div class="service-item reveal" data-cursor="Explore">
+                <span class="service-number">01</span>
+                <h3 class="service-title">Custom Web Applications</h3>
+                <p class="service-desc">Robust, interactive Single Page Applications tailored with modern JavaScript ecosystems. Built to deliver exceptional user experiences with fluid animations and performance.</p>
+            </div>
+            <div class="service-item reveal" data-cursor="Explore">
+                <span class="service-number">02</span>
+                <h3 class="service-title">UI/UX Responsive Design</h3>
+                <p class="service-desc">Mobile-first design schemas. I craft intuitive user interfaces with fluid animations, cohesive color systems, and optimal conversion journeys that feel incredibly natural.</p>
+            </div>
+            <div class="service-item reveal" data-cursor="Explore">
+                <span class="service-number">03</span>
+                <h3 class="service-title">Performance & SEO Auditing</h3>
+                <p class="service-desc">Eliminating script bloat, structural bottlenecks, and optimizing media. High Core Web Vital compliance to rank your services at the very top of Google organic metrics.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="section-label">
+            <span class="section-label-dot"></span>
+            <span>Testimonials</span>
+        </div>
+        <h2 class="section-title reveal">Trusted by ambitious clients</h2>
+        <div class="testimonials-wrapper reveal">
+            <div class="testimonial-card">
+                <div id="testimonial-quote">
+                    <p class="testimonial-quote">"Bitupan's work was exceptional. He rewritten our entire web interface using custom-tailored elements. Our loading speeds went from 4.2 seconds to under 0.8 seconds, and organic checkouts spiked by 35% within the first month itself."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">JS</div>
+                        <div>
+                            <div class="testimonial-name">Johnathan S.</div>
+                            <div class="testimonial-role">SaaS Founder, Austin TX</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-nav">
+                <div class="testimonial-dots">
+                    <span class="testimonial-dot active" data-index="0"></span>
+                    <span class="testimonial-dot" data-index="1"></span>
+                    <span class="testimonial-dot" data-index="2"></span>
+                </div>
+                <div class="testimonial-btns">
+                    <button class="testimonial-btn" id="slider-prev" data-cursor="Prev">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button class="testimonial-btn" id="slider-next" data-cursor="Next">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Metrics Section -->
@@ -1123,176 +1711,17 @@
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about">
-        <div class="about">
-            <div class="about-image reveal">
-                <img src="favicon.png" alt="Bitupan Borah">
-            </div>
-            <div class="about-content">
-                <span class="section-label">About</span>
-                <h2 class="section-title">Hi, I'm Bitupan Borah.</h2>
-                <p class="about-text">I handle every stage of your website personally, giving you direct communication, faster decisions, and complete accountability. No complexity. No noise. Just exceptional code.</p>
-                <div style="margin-top: 2rem;">
-                    <a href="#contact" class="btn-primary">
-                        Start a Project
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Philosophy Section -->
-    <section>
-        <div class="reveal">
-            <span class="section-label">Philosophy</span>
-            <h2 class="section-title">No Complexity. No Noise. Just Exceptional Code.</h2>
-            <p class="section-text">Websites shouldn't be sluggish piles of over-engineered templates. I work in the trenches of pure code, streamlining system designs so your clients load your product in milliseconds.</p>
-        </div>
-        <div class="reveal" style="margin-top: 4rem; padding: 3rem; background: rgba(243, 242, 239, 0.02); border: 1px solid var(--border); border-radius: 1.5rem;">
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
-                <div>
-                    <div style="font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;">Web Performance</div>
-                    <div style="font-family: var(--serif); font-size: 2.5rem;">100/100</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Google PageSpeed Insights Score</div>
-                </div>
-                <div>
-                    <div style="font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;">SEO Optimization</div>
-                    <div style="font-family: var(--serif); font-size: 2.5rem;">Perfect</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Structured Rich Snippets and Metadata</div>
-                </div>
-                <div>
-                    <div style="font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;">TTFB</div>
-                    <div style="font-family: var(--serif); font-size: 2.5rem;">&lt; 0.1s</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Lightning-fast edge delivery worldwide</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Services Section -->
-    <section id="services">
-        <div class="reveal">
-            <span class="section-label">Services</span>
-            <h2 class="section-title">Smart Solutions for a Greener Tomorrow.</h2>
-            <p class="section-text">As an agile freelance engineer, I provide production-grade web solutions tailored specifically to help businesses automate operations, scale platforms, and secure high-value conversions.</p>
-        </div>
-        <div class="services-list">
-            <div class="service-item reveal">
-                <span class="service-number">01</span>
-                <h3 class="service-title">Custom Web Applications</h3>
-                <p class="service-desc">Robust, interactive Single Page Applications tailored with modern JavaScript ecosystems. Built to deliver exceptional user experiences with fluid animations and performance.</p>
-            </div>
-            <div class="service-item reveal">
-                <span class="service-number">02</span>
-                <h3 class="service-title">UI/UX Responsive Design</h3>
-                <p class="service-desc">Mobile-first design schemas. I craft intuitive user interfaces with fluid animations, cohesive color systems, and optimal conversion journeys that feel incredibly natural.</p>
-            </div>
-            <div class="service-item reveal">
-                <span class="service-number">03</span>
-                <h3 class="service-title">Performance & SEO Auditing</h3>
-                <p class="service-desc">Eliminating script bloat, structural bottlenecks, and optimizing media. High Core Web Vital compliance to rank your services at the very top of Google organic metrics.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Ecosystem Section -->
-    <section id="ecosystem" class="ecosystem">
-        <div class="reveal">
-            <span class="section-label">Ecosystem</span>
-            <h2 class="section-title">The frontend ecosystem of <span style="color: var(--accent);">bitz.dev</span></h2>
-            <p class="section-text">I build using strict modern standards, structuring robust frontend environments and modular deployment pipelines that guarantee top performance.</p>
-        </div>
-        <div class="ecosystem-grid">
-            <div class="tab-controls reveal">
-                <button class="tab-btn active" data-tab="frontend">
-                    <span>1. The Frontend Stack</span>
-                    <span class="tab-dot"></span>
-                </button>
-                <button class="tab-btn" data-tab="devops">
-                    <span>2. DevOps & Scale</span>
-                    <span class="tab-dot"></span>
-                </button>
-            </div>
-            <div class="ecosystem-content reveal" id="ecosystem-content">
-                <span class="ecosystem-tag">React / JS</span>
-                <h3 class="ecosystem-heading">Intuitive, Blazing Fast Interfaces</h3>
-                <p class="ecosystem-text">The visual tier is optimized for high conversion. We employ lightweight components, custom Tailwind themes, and modular components that load instantly. Perfect Core Web Vitals is our standard.</p>
-                <div class="tech-grid">
-                    <div class="tech-item">
-                        <div class="tech-name">JS / TS</div>
-                        <div class="tech-desc">Robust Logic</div>
-                    </div>
-                    <div class="tech-item">
-                        <div class="tech-name">Tailwind</div>
-                        <div class="tech-desc">Responsive Utility</div>
-                    </div>
-                    <div class="tech-item">
-                        <div class="tech-name">Vite / ESB</div>
-                        <div class="tech-desc">Blazing Bundles</div>
-                    </div>
-                    <div class="tech-item">
-                        <div class="tech-name">A11y / SEO</div>
-                        <div class="tech-desc">Max Accessibility</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section id="testimonials">
-        <div class="reveal">
-            <span class="section-label">Testimonials</span>
-            <h2 class="section-title">Trusted by ambitious clients.</h2>
-            <p class="section-text">Read how my precise web engineering and professional communication model solve business issues in record times.</p>
-        </div>
-        <div class="testimonials-wrapper reveal">
-            <div class="testimonial-card">
-                <div id="testimonial-quote">
-                    <p class="testimonial-quote">"Bitupan's work was exceptional. He rewritten our entire web interface using custom-tailored elements. Our loading speeds went from 4.2 seconds to under 0.8 seconds, and organic checkouts spiked by 35% within the first month itself."</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">JS</div>
-                        <div>
-                            <div class="testimonial-name">Johnathan S.</div>
-                            <div class="testimonial-role">SaaS Founder, Austin TX</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-nav">
-                <div class="testimonial-dots">
-                    <span class="testimonial-dot active" data-index="0"></span>
-                    <span class="testimonial-dot" data-index="1"></span>
-                    <span class="testimonial-dot" data-index="2"></span>
-                </div>
-                <div class="testimonial-btns">
-                    <button class="testimonial-btn" id="slider-prev" aria-label="Previous">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                    </button>
-                    <button class="testimonial-btn" id="slider-next" aria-label="Next">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Contact Section -->
-    <section id="contact">
-        <div class="contact">
-            <div class="contact-info reveal">
-                <span class="section-label">Contact</span>
-                <h2 class="section-title">Grow with Confidence, Grow with Innovation.</h2>
-                <p class="section-text">Ready to elevate your digital presence? Let's talk about how we can build clean systems, speed up your codebase, and deliver absolute utility to your users.</p>
-                <div class="contact-details">
+    <section class="contact" id="contact">
+        <div class="contact-grid">
+            <div class="contact-info">
+                <div class="section-label">
+                    <span class="section-label-dot"></span>
+                    <span>Contact</span>
+                </div>
+                <h2 class="section-title reveal">Let's build something great together</h2>
+                <p class="contact-text reveal">Ready to elevate your digital presence? Let's talk about how we can build clean systems, speed up your codebase, and deliver absolute utility to your users.</p>
+                <div class="contact-details reveal">
                     <div class="contact-item">
                         <div class="contact-icon">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1351,7 +1780,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="form-message">Project Brief</label>
-                        <textarea id="form-message" name="message" class="form-textarea" placeholder="Let me know how I can add absolute value to your project..." required></textarea>
+                        <textarea id="form-message" name="message" class="form-textarea" placeholder="Tell me about your project..." required></textarea>
                     </div>
                     <button type="submit" class="form-submit">Submit Brief</button>
                 </form>
@@ -1366,17 +1795,17 @@
                 <div class="footer-logo">bitz.dev</div>
                 <p class="footer-desc">High-performance engineering structures and tailored pixel-perfection. Providing absolute code integrity to growing enterprises globally.</p>
                 <div class="footer-social">
-                    <a href="https://github.com/bitzzdev" target="_blank" aria-label="GitHub">
+                    <a href="https://github.com/bitzzdev" target="_blank" data-cursor="GitHub">
                         <svg fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                         </svg>
                     </a>
-                    <a href="https://instagram.com/bitz.dev" target="_blank" aria-label="Instagram">
+                    <a href="https://instagram.com/bitz.dev" target="_blank" data-cursor="Instagram">
                         <svg fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
                         </svg>
                     </a>
-                    <a href="mailto:bitupanborah1k@gmail.com" aria-label="Email">
+                    <a href="mailto:bitupanborah1k@gmail.com" data-cursor="Email">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                         </svg>
@@ -1385,31 +1814,31 @@
             </div>
             <div>
                 <h4 class="footer-heading">Quick Links</h4>
-                <ul class="footer-links">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#ecosystem">Ecosystem</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
+                <div class="footer-links">
+                    <a href="#home">Home</a>
+                    <a href="#work">Work</a>
+                    <a href="#process">Process</a>
+                    <a href="#services">Services</a>
+                    <a href="#contact">Contact</a>
+                </div>
             </div>
             <div>
                 <h4 class="footer-heading">Solutions</h4>
-                <ul class="footer-links">
-                    <li><a href="#services">Custom Web Applications</a></li>
-                    <li><a href="#services">UI/UX Interfaces</a></li>
-                    <li><a href="#services">SEO Auditing</a></li>
-                    <li><a href="#services">Performance Optimization</a></li>
-                </ul>
+                <div class="footer-links">
+                    <a href="#services">Custom Web Applications</a>
+                    <a href="#services">UI/UX Interfaces</a>
+                    <a href="#services">SEO Auditing</a>
+                    <a href="#services">Performance Optimization</a>
+                </div>
             </div>
             <div>
                 <h4 class="footer-heading">Connect</h4>
-                <ul class="footer-links">
-                    <li><a href="mailto:bitupanborah1k@gmail.com">bitupanborah1k@gmail.com</a></li>
-                    <li><a href="tel:+916002128705">+91 60021 28705</a></li>
-                    <li><a href="https://github.com/bitzzdev" target="_blank">GitHub</a></li>
-                    <li><a href="https://instagram.com/bitz.dev" target="_blank">Instagram</a></li>
-                </ul>
+                <div class="footer-links">
+                    <a href="mailto:bitupanborah1k@gmail.com">bitupanborah1k@gmail.com</a>
+                    <a href="tel:+916002128705">+91 60021 28705</a>
+                    <a href="https://github.com/bitzzdev" target="_blank">GitHub</a>
+                    <a href="https://instagram.com/bitz.dev" target="_blank">Instagram</a>
+                </div>
             </div>
         </div>
         <div class="footer-bottom">
