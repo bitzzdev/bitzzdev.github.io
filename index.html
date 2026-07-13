@@ -34,24 +34,6 @@
         button { background: none; border: none; color: inherit; font: inherit; cursor: none; }
         img { max-width: 100%; display: block; }
 
-        /* ═══ GRAIN ═══ */
-        .grain {
-            position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.035; will-change: transform;
-        }
-        .grain::before {
-            content: ''; position: absolute; inset: -200%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            background-size: 256px 256px; animation: grain 0.5s steps(6) infinite;
-        }
-        @keyframes grain {
-            0%, 100% { transform: translate(0, 0); }
-            17% { transform: translate(-5%, -10%); }
-            33% { transform: translate(3%, -15%); }
-            50% { transform: translate(12%, 9%); }
-            67% { transform: translate(9%, 4%); }
-            83% { transform: translate(-1%, 7%); }
-        }
-
         /* ═══ CURSOR ═══ */
         .cursor { position: fixed; top: 0; left: 0; z-index: 10000; pointer-events: none; mix-blend-mode: difference; }
         .cursor-dot { width: 8px; height: 8px; background: var(--text); border-radius: 50%; transform: translate(-50%, -50%); transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -121,24 +103,27 @@
 
         /* ═══ BIG SCROLL PARAGRAPH ═══ */
         .scroll-text {
-            padding: 15rem 2rem;
+            padding: 20vh 2rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
         }
         .scroll-text-inner {
-            max-width: 1100px;
+            max-width: 1400px;
             margin: 0 auto;
+            width: 100%;
         }
         .scroll-text p {
             font-family: var(--serif);
-            font-size: clamp(1.75rem, 4vw, 3.25rem);
-            line-height: 1.35;
+            font-size: clamp(2.5rem, 6vw, 5.5rem);
+            line-height: 1.2;
             font-weight: 400;
+            letter-spacing: -0.02em;
         }
         .scroll-text .line {
             color: var(--text-dim);
-            transition: color 0.4s ease;
-        }
-        .scroll-text .line.active {
-            color: var(--text-full);
+            transition: color 0.15s ease;
+            display: block;
         }
 
         /* ═══ WORK ═══ */
@@ -277,8 +262,6 @@
     </style>
 </head>
 <body>
-    <div class="grain" aria-hidden="true"></div>
-
     <div class="cursor" id="cursor">
         <div class="cursor-dot"></div>
         <div class="cursor-bubble" id="cursor-bubble"></div>
@@ -498,7 +481,7 @@
         <div class="footer-bottom"><p>&copy; 2026 bitz.dev. Handcrafted locally in India. All rights reserved.</p><div class="footer-bottom-links"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div></div>
     </footer>
 
-    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
