@@ -4,7 +4,10 @@ console.log('[bitz.dev] app.js loaded');
 // CANVAS GRAIN — reliable noise overlay
 // ═══════════════════════════════════════════════════════════
 function initGrain() {
-    const existing = document.querySelector('.grain-canvas');
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+
+    const existing = hero.querySelector('.grain-canvas');
     if (existing) return;
 
     const canvas = document.createElement('canvas');
@@ -30,12 +33,12 @@ function initGrain() {
     generateNoise();
 
     canvas.style.cssText =
-        'position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0.08;' +
+        'position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.06;' +
         'width:100%;height:100%;image-rendering:pixelated';
 
-    document.body.appendChild(canvas);
+    hero.appendChild(canvas);
 
-    setInterval(generateNoise, 200);
+    setInterval(generateNoise, 300);
 }
 initGrain();
 

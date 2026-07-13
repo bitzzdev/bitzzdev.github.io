@@ -92,13 +92,26 @@
 
         /* ═══ HERO — BIG NAME ═══ */
         .hero {
-            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
+            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; isolation: isolate;
+        }
+        .hero-bg {
+            position: absolute; inset: -50%; z-index: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 20% 50%, rgba(243,242,239,0.05) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 60% at 80% 50%, rgba(243,242,239,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 40% at 50% 30%, rgba(243,242,239,0.03) 0%, transparent 50%);
+            animation: heroGrad 14s ease-in-out infinite alternate;
+        }
+        @keyframes heroGrad {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(8%, -6%) scale(1.15); }
+            100% { transform: translate(-6%, 4%) scale(0.9); }
         }
         .hero-title {
-            font-family: var(--serif); font-size: clamp(4rem, 14vw, 12rem); line-height: 1; letter-spacing: -0.04em; text-align: center; font-weight: 400;
+            font-family: var(--serif); font-size: clamp(4rem, 14vw, 12rem); line-height: 1; letter-spacing: -0.04em; text-align: center; font-weight: 400; position: relative; z-index: 2;
         }
         .hero-subtitle {
-            font-size: 1rem; color: var(--text-mid); text-align: center; max-width: 400px; margin-top: 2rem; line-height: 1.7;
+            font-size: 1rem; color: var(--text-mid); text-align: center; max-width: 400px; margin-top: 2rem; line-height: 1.7; position: relative; z-index: 2;
         }
 
         /* ═══ BIG SCROLL PARAGRAPH ═══ */
@@ -332,9 +345,10 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════
-         HERO — BIG NAME
-         ═══════════════════════════════════════════════════════════ -->
+          HERO — BIG NAME
+          ═══════════════════════════════════════════════════════════ -->
     <section class="hero" id="home">
+        <div class="hero-bg"></div>
         <h1 class="hero-title">bitz.dev</h1>
         <p class="hero-subtitle">Freelance Frontend Developer crafting pixel-perfect, high-performance web experiences.</p>
     </section>
