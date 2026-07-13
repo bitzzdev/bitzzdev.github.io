@@ -34,23 +34,6 @@
         button { background: none; border: none; color: inherit; font: inherit; cursor: none; }
         img { max-width: 100%; display: block; }
 
-        /* ═══ GRAIN ═══ */
-        .grain {
-            position: fixed; inset: 0; z-index: 9998; pointer-events: none; opacity: 0.04; will-change: transform;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            background-repeat: repeat;
-            background-size: 180px 180px;
-            animation: grain 0.5s steps(6) infinite;
-        }
-        @keyframes grain {
-            0%, 100% { transform: translate(0, 0); }
-            17% { transform: translate(-5%, -10%); }
-            33% { transform: translate(3%, -15%); }
-            50% { transform: translate(12%, 9%); }
-            67% { transform: translate(9%, 4%); }
-            83% { transform: translate(-1%, 7%); }
-        }
-
         /* ═══ CURSOR ═══ */
         .cursor { position: fixed; top: 0; left: 0; z-index: 10000; pointer-events: none; mix-blend-mode: difference; }
         .cursor-dot { width: 8px; height: 8px; background: var(--text); border-radius: 50%; transform: translate(-50%, -50%); transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -117,11 +100,20 @@
                 radial-gradient(ellipse 80% 50% at 25% 40%, rgba(243,242,239,0.12) 0%, transparent 65%),
                 radial-gradient(ellipse 70% 50% at 75% 55%, rgba(243,242,239,0.08) 0%, transparent 65%),
                 radial-gradient(ellipse 60% 40% at 50% 30%, rgba(243,242,239,0.06) 0%, transparent 55%);
-            animation: heroGrad 40s ease-in-out infinite alternate;
         }
-        @keyframes heroGrad {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(3%, -2%) rotate(2deg); }
+        .hero-grain {
+            position: absolute; inset: -50%; z-index: 0; pointer-events: none; opacity: 0.04; will-change: transform;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 180px 180px;
+            animation: grainWave 14s ease-in-out infinite;
+            mix-blend-mode: screen;
+        }
+        @keyframes grainWave {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(2%, -2%) scale(1.01); }
+            50% { transform: translate(-1%, 1.5%) scale(0.99); }
+            75% { transform: translate(-2%, -1%) scale(1.005); }
         }
         .hero-title {
             font-family: var(--serif); font-size: clamp(4rem, 14vw, 12rem); line-height: 1; letter-spacing: -0.04em; text-align: center; font-weight: 400; position: relative; z-index: 2;
@@ -394,7 +386,6 @@
     </style>
 </head>
 <body>
-    <div class="grain" aria-hidden="true"></div>
     <div class="cursor" id="cursor">
         <div class="cursor-dot"></div>
         <div class="cursor-bubble" id="cursor-bubble"></div>
@@ -469,6 +460,7 @@
           ═══════════════════════════════════════════════════════════ -->
     <section class="hero" id="home">
         <div class="hero-bg"></div>
+        <div class="hero-grain"></div>
         <h1 class="hero-title">bitz.dev</h1>
         <p class="hero-subtitle">Freelance Frontend Developer crafting pixel-perfect, high-performance web experiences.</p>
     </section>
