@@ -1,48 +1,6 @@
 console.log('[bitz.dev] app.js loaded');
 
 // ═══════════════════════════════════════════════════════════
-// CANVAS GRAIN — reliable noise overlay
-// ═══════════════════════════════════════════════════════════
-function initGrain() {
-    const hero = document.querySelector('.hero');
-    if (!hero) return;
-
-    const existing = hero.querySelector('.grain-canvas');
-    if (existing) return;
-
-    const canvas = document.createElement('canvas');
-    canvas.className = 'grain-canvas';
-    canvas.width = 128;
-    canvas.height = 128;
-
-    const ctx = canvas.getContext('2d');
-
-    function generateNoise() {
-        const imageData = ctx.createImageData(128, 128);
-        const data = imageData.data;
-        for (let i = 0; i < data.length; i += 4) {
-            const v = Math.random() * 255;
-            data[i] = v;
-            data[i + 1] = v;
-            data[i + 2] = v;
-            data[i + 3] = 255;
-        }
-        ctx.putImageData(imageData, 0, 0);
-    }
-
-    generateNoise();
-
-    canvas.style.cssText =
-        'position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.06;' +
-        'width:100%;height:100%;image-rendering:pixelated';
-
-    hero.appendChild(canvas);
-
-    setInterval(generateNoise, 300);
-}
-initGrain();
-
-// ═══════════════════════════════════════════════════════════
 // LENIS SMOOTH SCROLL
 // ═══════════════════════════════════════════════════════════
 let lenis;
